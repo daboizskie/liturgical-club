@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>{{ settings|tojson|safe|replace('"','')|replace('{','') }}{{ settings }}</title>
 <title id="page-title">Liturgical Club</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -38,7 +37,6 @@
     min-height: 100vh;
     transition: background 0.3s, color 0.3s;
   }
-  /* ambient glow */
   body::before {
     content: '';
     position: fixed; inset: 0; pointer-events: none; z-index: 0;
@@ -62,7 +60,6 @@
     background: linear-gradient(135deg, #D4AF37, #F0D060, #D4AF37);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
-  /* Nav */
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     background: rgba(7,13,31,0.92);
@@ -85,7 +82,6 @@
   }
   .nav-link:hover, .nav-link.active { color: var(--gold); }
   .nav-link.active::after, .nav-link:hover::after { transform: scaleX(1); }
-  /* Hero */
   .hero-bg {
     min-height: 100vh;
     background: linear-gradient(160deg, #070D1F 0%, #0A1835 50%, #070D1F 100%);
@@ -96,7 +92,6 @@
     content: ''; position: absolute; inset: 0;
     background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(212,175,55,0.08) 0%, transparent 70%);
   }
-  /* Equalizer bars */
   .eq-bar {
     display: inline-block; width: 3px; border-radius: 2px;
     background: var(--gold); animation: eq-bounce 0.8s ease-in-out infinite alternate;
@@ -109,7 +104,6 @@
   .eq-bar:nth-child(5) { animation-delay: 0.25s; height: 7px; }
   @keyframes eq-bounce { from { transform: scaleY(0.3); } to { transform: scaleY(1); } }
   .eq-paused .eq-bar { animation-play-state: paused; transform: scaleY(0.3); }
-  /* Rainbow footer text */
   @keyframes rainbow-shift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -121,10 +115,8 @@
     animation: rainbow-shift 4s ease infinite;
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
-  /* Page sections */
   .page { display: none; padding-top: 80px; min-height: 100vh; }
   .page.active { display: block; }
-  /* Section headings */
   .section-heading {
     font-family: 'Cinzel', serif; font-size: 2rem; font-weight: 700;
     color: var(--gold); letter-spacing: 2px; text-align: center;
@@ -134,7 +126,6 @@
     width: 80px; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
     margin: 0 auto 2.5rem;
   }
-  /* Live Season pill */
   .season-pill {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 6px 16px; border-radius: 999px;
@@ -150,21 +141,17 @@
     0%,100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.6; transform: scale(1.3); }
   }
-  /* Gallery grid */
   .gallery-img {
     width: 100%; height: 220px; object-fit: cover;
     transition: transform 0.4s ease; display: block;
   }
   .gallery-item:hover .gallery-img { transform: scale(1.05); }
-  /* Mobile menu */
   #mobile-menu { display: none; }
   #mobile-menu.open { display: block; }
-  /* Scroll */
   html { scroll-behavior: smooth; }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--navy); }
   ::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.4); border-radius: 3px; }
-  /* Music player */
   #music-player {
     position: fixed; bottom: 24px; right: 24px; z-index: 200;
     min-width: 280px; max-width: 320px;
@@ -179,9 +166,7 @@
   #music-player.minimized #player-expanded { display: none; }
   #music-player.minimized #player-mini-icon { display: flex; }
   #player-mini-icon { display: none; }
-  /* Ministry cards */
   .ministry-img { width: 100%; height: 180px; object-fit: cover; }
-  /* Status bar */
   #status-bar {
     display: flex; align-items: center; justify-content: center; gap: 20px;
     flex-wrap: wrap; padding: 12px 20px;
@@ -189,20 +174,17 @@
     border-bottom: 1px solid rgba(212,175,55,0.15); backdrop-filter: blur(8px);
   }
   html.light #status-bar { background: rgba(240,244,255,0.8); }
-  /* Confirmation card */
   .verse-confirm {
     background: linear-gradient(135deg, rgba(14,24,54,0.95), rgba(10,20,40,0.95));
     border: 1px solid rgba(212,175,55,0.5); border-radius: 16px; padding: 32px;
     text-align: center; max-width: 540px; margin: 0 auto;
   }
   html.light .verse-confirm { background: linear-gradient(135deg, #fff, #f0f4ff); }
-  /* spin animation for cross */
   @keyframes cross-glow {
     0%,100% { text-shadow: 0 0 10px rgba(212,175,55,0.5); }
     50% { text-shadow: 0 0 25px rgba(212,175,55,0.9), 0 0 50px rgba(212,175,55,0.4); }
   }
   .cross-glow { animation: cross-glow 3s ease-in-out infinite; }
-  /* Button base */
   .btn-gold {
     background: linear-gradient(135deg, #D4AF37, #F0D060);
     color: #070D1F; font-weight: 700; border: none; cursor: pointer;
@@ -211,7 +193,6 @@
   }
   .btn-gold:hover { opacity: 0.9; transform: translateY(-1px); }
   .btn-gold:active { transform: translateY(0); }
-  /* Input base */
   .inp {
     width: 100%; padding: 10px 14px; border-radius: 8px; outline: none;
     background: rgba(10,20,40,0.6); border: 1px solid rgba(212,175,55,0.25);
@@ -221,7 +202,6 @@
   html.light .inp { background: rgba(255,255,255,0.8); border-color: rgba(212,175,55,0.4); }
   .inp:focus { border-color: rgba(212,175,55,0.7); }
   .inp::placeholder { color: var(--text-secondary); opacity: 0.7; }
-  /* Schedule card */
   .sched-card {
     display: grid; grid-template-columns: auto 1fr; gap: 0 16px;
     background: rgba(14,24,54,0.85); border: 1px solid rgba(212,175,55,0.2);
@@ -229,22 +209,16 @@
   }
   html.light .sched-card { background: rgba(255,255,255,0.9); }
   .sched-card:hover { border-color: rgba(212,175,55,0.5); }
-  /* Overlay for joining */
   .form-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block; }
   textarea.inp { resize: vertical; min-height: 80px; }
-  /* Transition fade */
   .page-fade { animation: pageFade 0.35s ease; }
   @keyframes pageFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════
-     NAV
-═══════════════════════════════════════════════════ -->
 <nav>
   <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-    <!-- Logo -->
     <button onclick="navigate('home')" class="flex items-center gap-3 shrink-0">
       <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="18" cy="18" r="17" stroke="#D4AF37" stroke-width="1.5" fill="rgba(10,20,40,0.6)"/>
@@ -254,7 +228,6 @@
       </svg>
       <span class="cinzel font-bold text-base leading-tight" style="color:var(--gold);" id="nav-site-name">Liturgical Club</span>
     </button>
-    <!-- Desktop links -->
     <div class="hidden md:flex items-center gap-6">
       <span class="nav-link active" onclick="navigate('home')" id="nav-home">Home</span>
       <span class="nav-link" onclick="navigate('about')" id="nav-about">About</span>
@@ -263,26 +236,21 @@
       <span class="nav-link" onclick="navigate('gallery')" id="nav-gallery">Gallery</span>
       <span class="nav-link" onclick="navigate('join')" id="nav-join">Join</span>
     </div>
-    <!-- Right cluster -->
     <div class="hidden md:flex items-center gap-4">
       <a id="nav-fb" href="#" target="_blank" rel="noopener" class="nav-link" title="Facebook">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
       </a>
-      <!-- Theme toggle -->
-      <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-full border border-gold/30 hover:border-gold/70 transition" title="Toggle theme" style="border-color:rgba(212,175,55,0.3)">
+      <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-full border transition" style="border-color:rgba(212,175,55,0.3)" title="Toggle theme">
         <span id="theme-icon"><i data-lucide="sun" width="16" height="16"></i></span>
       </button>
-      <!-- Admin lock -->
       <a href="/admin" class="nav-link opacity-50 hover:opacity-100" title="Admin">
         <i data-lucide="lock" width="14" height="14"></i>
       </a>
     </div>
-    <!-- Mobile burger -->
     <button onclick="document.getElementById('mobile-menu').classList.toggle('open')" class="md:hidden p-2" style="color:var(--gold)">
       <i data-lucide="menu" width="22" height="22"></i>
     </button>
   </div>
-  <!-- Mobile menu -->
   <div id="mobile-menu" class="md:hidden px-4 pb-4 border-t" style="border-color:rgba(212,175,55,0.15)">
     <div class="flex flex-col gap-3 pt-3">
       <span class="nav-link" onclick="navigate('home');closeMobileMenu()">Home</span>
@@ -299,28 +267,19 @@
   </div>
 </nav>
 
-<!-- ═══════════════════════════════════════════════════
-     HOME PAGE
-═══════════════════════════════════════════════════ -->
+<!-- HOME -->
 <section id="page-home" class="page active">
-  <!-- Hero -->
   <div class="hero-bg relative flex flex-col items-center justify-center text-center px-4" style="min-height:100vh;">
     <div class="relative z-10 max-w-3xl">
       <div class="text-7xl mb-6 cross-glow cinzel" style="color:var(--gold)">✝</div>
-      <h1 id="hero-title" class="cinzel text-4xl md:text-6xl font-black mb-4 leading-tight" style="color:var(--gold);">
-        Welcome to the Liturgical Club
-      </h1>
-      <p id="hero-subtitle" class="text-lg md:text-xl mb-8 max-w-xl mx-auto" style="color:var(--text-secondary);">
-        A community of young ministers dedicated to the beauty of Catholic worship
-      </p>
+      <h1 id="hero-title" class="cinzel text-4xl md:text-6xl font-black mb-4 leading-tight" style="color:var(--gold);">Welcome to the Liturgical Club</h1>
+      <p id="hero-subtitle" class="text-lg md:text-xl mb-8 max-w-xl mx-auto" style="color:var(--text-secondary);">A community of young ministers dedicated to the beauty of Catholic worship</p>
       <div class="flex flex-wrap gap-4 justify-center">
         <button onclick="navigate('join')" class="btn-gold px-8 py-3 text-sm">Join Our Ministry</button>
         <button onclick="navigate('about')" class="px-8 py-3 text-sm font-semibold rounded-full border transition" style="border-color:rgba(212,175,55,0.5);color:var(--gold);background:transparent;" onmouseover="this.style.background='rgba(212,175,55,0.1)'" onmouseout="this.style.background='transparent'">Learn More</button>
       </div>
     </div>
   </div>
-
-  <!-- Info Cards -->
   <div class="max-w-7xl mx-auto px-4 py-16">
     <h2 class="section-heading">Our Community</h2>
     <div class="section-divider"></div>
@@ -328,9 +287,7 @@
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════
-     ABOUT PAGE
-═══════════════════════════════════════════════════ -->
+<!-- ABOUT -->
 <section id="page-about" class="page">
   <div class="max-w-5xl mx-auto px-4 py-16">
     <h2 class="section-heading">About Us</h2>
@@ -339,16 +296,13 @@
       <div class="text-5xl text-center mb-6 cross-glow" style="color:var(--gold)">✝</div>
       <p id="about-text" class="text-base leading-8 text-center" style="color:var(--text-secondary);"></p>
     </div>
-    <!-- Officers -->
     <h3 class="section-heading text-2xl mb-2">Our Officers</h3>
     <div class="section-divider"></div>
     <div id="officers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════
-     MINISTRIES PAGE
-═══════════════════════════════════════════════════ -->
+<!-- MINISTRIES -->
 <section id="page-ministries" class="page">
   <div class="max-w-7xl mx-auto px-4 py-16">
     <h2 class="section-heading">Our Ministries</h2>
@@ -357,9 +311,7 @@
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════
-     SCHEDULES PAGE
-═══════════════════════════════════════════════════ -->
+<!-- SCHEDULES -->
 <section id="page-schedules" class="page">
   <div class="max-w-4xl mx-auto px-4 py-16">
     <h2 class="section-heading">Schedules</h2>
@@ -368,9 +320,7 @@
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════
-     GALLERY PAGE
-═══════════════════════════════════════════════════ -->
+<!-- GALLERY -->
 <section id="page-gallery" class="page">
   <div class="max-w-7xl mx-auto px-4 py-16">
     <h2 class="section-heading">Gallery</h2>
@@ -379,9 +329,7 @@
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════
-     JOIN PAGE
-═══════════════════════════════════════════════════ -->
+<!-- JOIN -->
 <section id="page-join" class="page">
   <div class="max-w-2xl mx-auto px-4 py-16">
     <h2 class="section-heading">Join Our Ministry</h2>
@@ -434,7 +382,6 @@
         </form>
       </div>
     </div>
-    <!-- Confirmation card (hidden until submit) -->
     <div id="join-confirm" style="display:none;" class="page-fade">
       <div class="verse-confirm">
         <div class="text-6xl mb-4 cross-glow" style="color:var(--gold)">✝</div>
@@ -451,9 +398,7 @@
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════
-     STATUS BAR (above footer)
-═══════════════════════════════════════════════════ -->
+<!-- STATUS BAR -->
 <div id="status-bar">
   <div class="flex items-center gap-2">
     <i data-lucide="clock" width="14" height="14" style="color:var(--gold)"></i>
@@ -462,23 +407,17 @@
   <div id="season-pill-container"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     FOOTER
-═══════════════════════════════════════════════════ -->
+<!-- FOOTER -->
 <footer class="py-8 text-center border-t" style="border-color:rgba(212,175,55,0.15);">
   <p class="text-sm font-semibold rainbow-text" id="footer-text">© 2026 Liturgical Club | Developed by: Begie</p>
   <p class="text-xs mt-2" style="color:var(--text-secondary);">Ora et Labora · Serving with Joy and Faith</p>
 </footer>
 
-<!-- ═══════════════════════════════════════════════════
-     MUSIC PLAYER
-═══════════════════════════════════════════════════ -->
+<!-- MUSIC PLAYER -->
 <div id="music-player" style="display:none;">
-  <!-- Mini icon (when minimized) -->
   <button id="player-mini-icon" onclick="expandPlayer()" style="color:var(--gold);width:100%;height:100%;align-items:center;justify-content:center;">
     <i data-lucide="music" width="22" height="22"></i>
   </button>
-  <!-- Expanded -->
   <div id="player-expanded">
     <div class="flex items-start justify-between mb-2">
       <div class="flex items-end gap-1 mr-2" id="eq-container">
@@ -507,7 +446,6 @@
 <audio id="bg-audio" loop preload="none"></audio>
 
 <script>
-// ─── Data injected by Flask ─────────────────────────────────────────
 const SETTINGS   = {{ settings|safe }};
 const CARDS      = {{ cards|safe }};
 const MINISTRIES = {{ ministries|safe }};
@@ -517,7 +455,6 @@ const OFFICERS   = {{ officers|safe }};
 const LITURGICAL = {{ liturgical|safe }};
 const INITIAL_PAGE = "{{ initial_page }}";
 
-// ─── Theme ───────────────────────────────────────────────────────────
 function applyTheme(theme) {
   document.documentElement.classList.toggle('light', theme === 'light');
   document.documentElement.classList.toggle('dark', theme !== 'light');
@@ -534,7 +471,6 @@ function toggleTheme() {
 }
 applyTheme(localStorage.getItem('theme') || 'dark');
 
-// ─── SPA Navigation ──────────────────────────────────────────────────
 const PAGES = ['home','about','ministries','schedules','gallery','join'];
 function navigate(page) {
   if (!PAGES.includes(page)) page = 'home';
@@ -549,11 +485,8 @@ function navigate(page) {
   lucide.createIcons();
 }
 window.addEventListener('popstate', e => navigate((e.state && e.state.page) || 'home'));
-function closeMobileMenu() {
-  document.getElementById('mobile-menu').classList.remove('open');
-}
+function closeMobileMenu() { document.getElementById('mobile-menu').classList.remove('open'); }
 
-// ─── Render helpers ──────────────────────────────────────────────────
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function img(url, alt, cls) {
   const src = url || 'https://images.unsplash.com/photo-1574607383476-f517f7d40f09?w=800&q=60';
@@ -570,7 +503,6 @@ function renderCards() {
       <p class="text-sm leading-6" style="color:var(--text-secondary);">${esc(c.body)}</p>
     </div>`).join('');
 }
-
 function renderOfficers() {
   const g = document.getElementById('officers-grid');
   if (!g) return;
@@ -584,12 +516,11 @@ function renderOfficers() {
       </div>
     </div>`).join('') || '<p class="text-center col-span-3" style="color:var(--text-secondary);">No officers listed yet.</p>';
 }
-
 function renderMinistries() {
   const g = document.getElementById('ministries-grid');
   if (!g) return;
   g.innerHTML = MINISTRIES.map(m => `
-    <div class="glass-card rounded-2xl overflow-hidden ministry-card">
+    <div class="glass-card rounded-2xl overflow-hidden">
       <div class="overflow-hidden">${img(m.image_url, m.name, 'ministry-img transition-transform duration-300')}</div>
       <div class="p-6">
         <h3 class="cinzel font-bold text-lg mb-2" style="color:var(--gold);">${esc(m.name)}</h3>
@@ -597,7 +528,6 @@ function renderMinistries() {
       </div>
     </div>`).join('') || '<p style="color:var(--text-secondary);">No ministries yet.</p>';
 }
-
 function renderSchedules() {
   const g = document.getElementById('schedules-list');
   if (!g) return;
@@ -611,7 +541,6 @@ function renderSchedules() {
       </div>
     </div>`).join('') || '<p style="color:var(--text-secondary);">No schedules yet.</p>';
 }
-
 function renderGallery() {
   const g = document.getElementById('gallery-grid');
   if (!g) return;
@@ -624,7 +553,6 @@ function renderGallery() {
       </div>
     </div>`).join('') || '<p style="color:var(--text-secondary);">No gallery items yet.</p>';
 }
-
 function renderSettings() {
   document.getElementById('page-title').textContent = SETTINGS.site_name || 'Liturgical Club';
   document.getElementById('nav-site-name').textContent = SETTINGS.site_name || 'Liturgical Club';
@@ -635,14 +563,12 @@ function renderSettings() {
   if (ft && SETTINGS.footer_rainbow_text) ft.textContent = SETTINGS.footer_rainbow_text;
   const fb = document.getElementById('nav-fb');
   if (fb) fb.href = SETTINGS.facebook_url || '#';
-  // Ministry dropdown — if ministries loaded populate select
   const sel = document.querySelector('select[name="ministry"]');
   if (sel && MINISTRIES.length > 0) {
     sel.innerHTML = '<option value="">— Select a Ministry —</option>' + MINISTRIES.map(m=>`<option>${esc(m.name)}</option>`).join('');
   }
 }
 
-// ─── PHT Clock ───────────────────────────────────────────────────────
 function tickClock() {
   const now = new Date();
   const pht = new Date(now.toLocaleString('en-US', {timeZone:'Asia/Manila'}));
@@ -654,12 +580,8 @@ function tickClock() {
 }
 setInterval(tickClock, 1000); tickClock();
 
-// ─── Liturgical Season Pill ───────────────────────────────────────────
 function renderSeasonPill() {
-  const colorMap = {
-    green: '#2E7D32', purple: '#6B2D8B', gold: '#D4AF37',
-    red: '#C0392B', white: '#E0E0E0', rose: '#FF6B9D'
-  };
+  const colorMap = {green:'#2E7D32',purple:'#6B2D8B',gold:'#D4AF37',red:'#C0392B',white:'#E0E0E0',rose:'#FF6B9D'};
   const hex = colorMap[LITURGICAL.color] || '#2E7D32';
   document.getElementById('season-pill-container').innerHTML = `
     <div class="season-pill">
@@ -668,7 +590,6 @@ function renderSeasonPill() {
     </div>`;
 }
 
-// ─── Join form ────────────────────────────────────────────────────────
 async function submitJoinForm(e) {
   e.preventDefault();
   const btn = document.getElementById('join-submit-btn');
@@ -686,7 +607,6 @@ async function submitJoinForm(e) {
     });
     const data = await r.json();
     if (data.success) {
-      // Parse verse
       const verse = data.verse || '';
       const match = verse.match(/^"(.+)"\s*[—-]\s*(.+)$/);
       document.getElementById('confirm-verse-text').textContent = match ? match[1] : verse;
@@ -705,7 +625,6 @@ async function submitJoinForm(e) {
   }
 }
 
-// ─── Music Player ─────────────────────────────────────────────────────
 let audioUnlocked = false;
 const audio = document.getElementById('bg-audio');
 let isPlaying = false;
@@ -721,17 +640,12 @@ function setupPlayer() {
   audio.volume = 0.6;
   lucide.createIcons();
 }
-
 function tryAutoPlay() {
   if (audioUnlocked || !SETTINGS.music_enabled) return;
   audio.play().then(() => {
-    audioUnlocked = true;
-    isPlaying = true;
-    updatePlayBtn();
-    updateEQ();
+    audioUnlocked = true; isPlaying = true; updatePlayBtn(); updateEQ();
   }).catch(() => {});
 }
-
 function unlockOnInteraction() {
   tryAutoPlay();
   document.removeEventListener('click', unlockOnInteraction);
@@ -739,7 +653,6 @@ function unlockOnInteraction() {
   document.removeEventListener('scroll', unlockOnInteraction);
   document.removeEventListener('keydown', unlockOnInteraction);
 }
-
 function togglePlay() {
   if (audio.paused) { audio.play(); isPlaying = true; }
   else { audio.pause(); isPlaying = false; }
@@ -758,16 +671,11 @@ function updatePlayBtn() {
 function updateEQ() {
   document.getElementById('eq-container').classList.toggle('eq-paused', audio.paused);
 }
-function minimizePlayer() {
-  document.getElementById('music-player').classList.add('minimized');
-}
-function expandPlayer() {
-  document.getElementById('music-player').classList.remove('minimized');
-}
+function minimizePlayer() { document.getElementById('music-player').classList.add('minimized'); }
+function expandPlayer() { document.getElementById('music-player').classList.remove('minimized'); }
 audio.addEventListener('play', () => { isPlaying = true; updatePlayBtn(); updateEQ(); });
 audio.addEventListener('pause', () => { isPlaying = false; updatePlayBtn(); updateEQ(); });
 
-// ─── Init ─────────────────────────────────────────────────────────────
 renderSettings();
 renderCards();
 renderOfficers();
@@ -783,7 +691,6 @@ document.addEventListener('touchstart', unlockOnInteraction, {passive:true});
 document.addEventListener('scroll', unlockOnInteraction, {passive:true});
 document.addEventListener('keydown', unlockOnInteraction);
 
-// Lucide final pass
 setTimeout(() => lucide.createIcons(), 100);
 </script>
 </body>
