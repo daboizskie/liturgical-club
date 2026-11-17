@@ -1,718 +1,949 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin — Liturgical Club</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Plus Jakarta Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      darkMode: ['attribute', '[data-theme="dark"]'],
-      theme: {
-        extend: {
-          colors: {
-            navy: { DEFAULT: '#091024', card: '#0F1A38', light: '#152040' },
-            gold: { DEFAULT: '#D4AF37', light: '#E8CC6A' },
-          },
-          fontFamily: {
-            cinzel: ['Cinzel', 'serif'],
-            jakarta: ['Plus Jakarta Sans', 'sans-serif'],
-          },
-        },
-      },
-    };
-  </script>
-  <style>
-    * { font-family: 'Plus Jakarta Sans', sans-serif; }
-    h1,h2,h3,.font-cinzel { font-family: 'Cinzel', serif; }
-    [data-theme="dark"] body { background: #091024; color: #e8e0d0; }
-    [data-theme="light"] body { background: #f4f0e8; color: #1a1200; }
-    [data-theme="dark"] .card-bg { background: #0F1A38; border-color: rgba(212,175,55,0.2); }
-    [data-theme="light"] .card-bg { background: #fff8e8; border-color: rgba(212,175,55,0.3); }
-    [data-theme="dark"] .sidebar-bg { background: #0a1328; }
-    [data-theme="light"] .sidebar-bg { background: #f0e8d0; }
-    .gold-text { color: #D4AF37; }
-    .gold-border { border: 1px solid rgba(212,175,55,0.25); }
-    .gold-glow { box-shadow: 0 0 20px rgba(212,175,55,0.1); }
-    input,textarea,select {
-      background: rgba(9,16,36,0.5); border: 1px solid rgba(212,175,55,0.2);
-      color: inherit; border-radius: 0.4rem; padding: 0.5rem 0.75rem; width: 100%;
-      outline: none; transition: border-color 0.2s; font-size: 0.875rem;
-    }
-    [data-theme="light"] input,[data-theme="light"] textarea,[data-theme="light"] select { background: rgba(255,248,232,0.8); color: #1a1200; }
-    input:focus,textarea:focus,select:focus { border-color: #D4AF37; }
-    .btn-gold { background: #D4AF37; color: #091024; font-weight: 700; padding: 0.5rem 1.2rem; border-radius: 0.4rem; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
-    .btn-gold:hover { background: #E8CC6A; }
-    .btn-outline { border: 1px solid rgba(212,175,55,0.4); color: #D4AF37; padding: 0.5rem 1.2rem; border-radius: 0.4rem; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
-    .btn-outline:hover { background: rgba(212,175,55,0.1); }
-    .btn-danger { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); padding: 0.35rem 0.7rem; border-radius: 0.3rem; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; }
-    .btn-danger:hover { background: rgba(239,68,68,0.3); }
-    .btn-sm { padding: 0.3rem 0.7rem; font-size: 0.75rem; }
-    .tab-btn { padding: 0.5rem 1rem; border-radius: 0.4rem; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-    .tab-btn.active { background: #D4AF37; color: #091024; font-weight: 700; }
-    .tab-btn:not(.active) { opacity: 0.6; }
-    .tab-btn:not(.active):hover { opacity: 1; }
-    .sidebar-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.9rem; border-radius: 0.4rem; font-size: 0.85rem; cursor: pointer; transition: all 0.15s; }
-    .sidebar-link.active, .sidebar-link:hover { background: rgba(212,175,55,0.12); color: #D4AF37; }
-    .section-panel { display: none; }
-    .section-panel.active { display: block; animation: fadeIn 0.25s ease; }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-    .table-row { display: grid; gap: 0.5rem; align-items: center; padding: 0.6rem 0.75rem; border-radius: 0.4rem; border: 1px solid rgba(212,175,55,0.1); }
-    .table-row:nth-child(even) { background: rgba(212,175,55,0.02); }
-    .badge { display: inline-flex; align-items: center; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600; }
-    .badge-pending { background: rgba(251,191,36,0.15); color: #fbbf24; }
-    .badge-approved { background: rgba(34,197,94,0.15); color: #22c55e; }
-    .badge-contacted { background: rgba(99,102,241,0.15); color: #818cf8; }
-    .modal-overlay { position: fixed; inset:0; background: rgba(0,0,0,0.75); z-index:100; display:none; align-items:center; justify-content:center; padding: 1rem; }
-    .modal-overlay.open { display: flex; }
-    .modal-box { background: #0F1A38; border: 1px solid rgba(212,175,55,0.25); border-radius: 1rem; padding: 1.5rem; width:100%; max-width: 540px; max-height: 90vh; overflow-y: auto; }
-    [data-theme="light"] .modal-box { background: #fff8e8; }
-    .toggle-track { width: 44px; height: 24px; border-radius: 999px; background: rgba(212,175,55,0.2); border: 1px solid rgba(212,175,55,0.3); cursor: pointer; position: relative; transition: background 0.2s; }
-    .toggle-track.on { background: #D4AF37; }
-    .toggle-thumb { width: 18px; height: 18px; border-radius: 50%; background: white; position: absolute; top: 2px; left: 2px; transition: left 0.2s; }
-    .toggle-track.on .toggle-thumb { left: 22px; }
-    .flash { padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.85rem; margin-bottom: 1rem; }
-    .flash-success { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
-    .flash-error   { background: rgba(239,68,68,0.15);  border: 1px solid rgba(239,68,68,0.3);  color: #fca5a5; }
-    label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6; display: block; margin-bottom: 0.25rem; }
-    .form-group { margin-bottom: 1rem; }
-    .color-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
-    .color-swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; }
-    .color-swatch.selected { border-color: #D4AF37; transform: scale(1.15); }
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.2); border-radius: 3px; }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Admin — Liturgical Club</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --gold: #D4AF37; --gold-light: #F0D060;
+    --navy: #070D1F; --navy-card: #0E1836; --navy-mid: #0A1428;
+    --text-primary: #F0E8D0; --text-secondary: #A8BFD8;
+    --sidebar-w: 240px; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--navy); color: var(--text-primary); font-family: 'Plus Jakarta Sans', sans-serif; }
+  .cinzel { font-family: 'Cinzel', serif; }
+  /* Sidebar */
+  #sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: var(--sidebar-w); background: rgba(10,20,40,0.97);
+    border-right: 1px solid rgba(212,175,55,0.2); z-index: 50;
+    display: flex; flex-direction: column; overflow-y: auto;
+    transition: transform 0.3s;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; border-radius: 8px; cursor: pointer;
+    font-size: 13px; font-weight: 500; color: var(--text-secondary);
+    transition: all 0.2s; text-decoration: none; border: none; background: none; width: 100%; text-align: left;
+  }
+  .nav-item:hover { background: rgba(212,175,55,0.08); color: var(--gold); }
+  .nav-item.active { background: rgba(212,175,55,0.15); color: var(--gold); }
+  /* Main content */
+  #main { margin-left: var(--sidebar-w); min-height: 100vh; }
+  /* Header bar */
+  #topbar {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(10,20,40,0.97); border-bottom: 1px solid rgba(212,175,55,0.15);
+    padding: 14px 24px; display: flex; align-items: center; justify-between: 0; justify-content: space-between;
+  }
+  /* Section panels */
+  .admin-section { display: none; }
+  .admin-section.active { display: block; }
+  /* Cards */
+  .a-card {
+    background: rgba(14,24,54,0.85); border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 12px; padding: 20px; transition: border-color 0.2s;
+  }
+  .a-card:hover { border-color: rgba(212,175,55,0.4); }
+  /* Inputs */
+  .inp {
+    width: 100%; padding: 9px 12px; border-radius: 7px; outline: none;
+    background: rgba(10,20,40,0.7); border: 1px solid rgba(212,175,55,0.2);
+    color: var(--text-primary); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;
+    transition: border-color 0.2s;
+  }
+  .inp:focus { border-color: rgba(212,175,55,0.6); }
+  .inp::placeholder { color: rgba(168,191,216,0.5); }
+  textarea.inp { resize: vertical; min-height: 70px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block; }
+  /* Buttons */
+  .btn-gold { background: linear-gradient(135deg,#D4AF37,#F0D060); color: #070D1F; font-weight: 700; border: none; cursor: pointer; border-radius: 7px; padding: 8px 16px; font-size: 12px; font-family: 'Plus Jakarta Sans', sans-serif; transition: opacity 0.2s; }
+  .btn-gold:hover { opacity: 0.85; }
+  .btn-outline { background: transparent; border: 1px solid rgba(212,175,55,0.4); color: var(--gold); font-size: 12px; font-weight: 600; border-radius: 7px; padding: 7px 14px; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.2s; }
+  .btn-outline:hover { background: rgba(212,175,55,0.1); }
+  .btn-danger { background: rgba(192,57,43,0.15); border: 1px solid rgba(192,57,43,0.4); color: #e74c3c; font-size: 12px; font-weight: 600; border-radius: 7px; padding: 7px 12px; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.2s; }
+  .btn-danger:hover { background: rgba(192,57,43,0.25); }
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-box {
+    background: #0A1428; border: 1px solid rgba(212,175,55,0.3); border-radius: 16px;
+    padding: 28px; max-width: 580px; width: 100%; max-height: 85vh; overflow-y: auto;
+    animation: modal-in 0.25s ease;
+  }
+  @keyframes modal-in { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  /* Flash messages */
+  .flash { padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; margin-bottom: 16px; }
+  .flash-success { background: rgba(46,125,50,0.2); border: 1px solid rgba(46,125,50,0.4); color: #81c784; }
+  .flash-error { background: rgba(192,57,43,0.2); border: 1px solid rgba(192,57,43,0.4); color: #e57373; }
+  /* Badge */
+  .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; font-size: 10px; font-weight: 700; background: #c0392b; color: #fff; }
+  /* Row item */
+  .item-row { display: flex; align-items: start; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(212,175,55,0.08); }
+  .item-row:last-child { border-bottom: none; }
+  /* Status badge */
+  .status-badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .status-pending { background: rgba(212,175,55,0.15); color: var(--gold); border: 1px solid rgba(212,175,55,0.3); }
+  .status-approved { background: rgba(46,125,50,0.15); color: #81c784; border: 1px solid rgba(46,125,50,0.3); }
+  .status-rejected { background: rgba(192,57,43,0.15); color: #e57373; border: 1px solid rgba(192,57,43,0.3); }
+  /* Scroll */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--navy); }
+  ::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.3); border-radius: 3px; }
+  /* Responsive */
+  @media(max-width:768px) { #sidebar { transform: translateX(-100%); } #sidebar.open { transform: translateX(0); } #main { margin-left: 0; } }
+  /* Section heading */
+  .sec-heading { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 700; color: var(--gold); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  /* Color dot */
+  .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  /* Toggle switch */
+  .toggle { position: relative; display: inline-block; width: 40px; height: 22px; }
+  .toggle input { display: none; }
+  .toggle-slider { position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 999px; cursor: pointer; transition: 0.3s; }
+  .toggle-slider::before { content:''; position:absolute; width:16px; height:16px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.3s; }
+  .toggle input:checked + .toggle-slider { background: var(--gold); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+</style>
 </head>
-<body class="min-h-screen">
+<body>
+
+{% set logged_in = session.get('admin_logged_in') %}
 
 {% if not logged_in %}
-<!-- ==================== LOGIN ==================== -->
-<div class="min-h-screen flex items-center justify-center px-4">
-  <div class="card-bg gold-border rounded-2xl p-8 w-full max-w-sm gold-glow">
-    <div class="text-center mb-8">
-      <div class="w-14 h-14 rounded-full border-2 border-gold mx-auto mb-4 flex items-center justify-center">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2L14 7H19L15 10.5L16.5 16L12 13L7.5 16L9 10.5L5 7H10L12 2Z" fill="#D4AF37"/></svg>
-      </div>
-      <h1 class="font-cinzel text-xl font-bold gold-text tracking-widest">LITURGICAL CLUB</h1>
-      <p class="text-xs opacity-50 mt-1">Admin Control Panel</p>
-    </div>
+<!-- ═══════════════════════════════════════════════════
+     LOGIN PAGE
+═══════════════════════════════════════════════════ -->
+<div class="min-h-screen flex items-center justify-center px-4" style="background:linear-gradient(160deg,#070D1F,#0A1835);">
+  <div style="max-width:400px;width:100%;background:rgba(14,24,54,0.9);border:1px solid rgba(212,175,55,0.3);border-radius:20px;padding:40px;" class="text-center">
+    <div class="text-5xl mb-4" style="color:var(--gold)">✝</div>
+    <h1 class="cinzel text-2xl font-bold mb-1" style="color:var(--gold);">Admin Access</h1>
+    <p class="text-sm mb-6" style="color:var(--text-secondary);">Liturgical Club Dashboard</p>
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, message in messages %}
-        <div class="flash flash-{{ 'success' if category == 'success' else 'error' }}">{{ message }}</div>
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">{{ msg }}</div>
       {% endfor %}
     {% endwith %}
-    <form method="POST" action="/admin/login" class="space-y-4">
-      <div>
-        <label>Username</label>
-        <input type="text" name="username" required autofocus placeholder="admin" />
+    <form method="POST" action="/admin/login">
+      <div class="text-left mb-4">
+        <label class="form-label">Username</label>
+        <input name="username" class="inp" placeholder="admin" autocomplete="username" required/>
       </div>
-      <div>
-        <label>Password</label>
-        <input type="password" name="password" required placeholder="••••••••" />
+      <div class="text-left mb-6">
+        <label class="form-label">Password</label>
+        <input name="password" type="password" class="inp" placeholder="••••••••" autocomplete="current-password" required/>
       </div>
-      <button type="submit" class="btn-gold w-full text-center py-2.5 mt-2">Sign In</button>
+      <button type="submit" class="btn-gold w-full py-3 text-sm">Sign In</button>
     </form>
-    <p class="text-center mt-4 text-xs opacity-30">← <a href="/" class="hover:opacity-60">Back to site</a></p>
+    <a href="/" class="text-xs mt-4 inline-block" style="color:var(--text-secondary);">← Back to Website</a>
   </div>
 </div>
 
 {% else %}
-<!-- ==================== DASHBOARD ==================== -->
+<!-- ═══════════════════════════════════════════════════
+     DASHBOARD
+═══════════════════════════════════════════════════ -->
 
-<script>
-  const APP_DATA = {{ app_data | tojson }};
-</script>
+<!-- Mobile overlay -->
+<div id="sidebar-overlay" onclick="toggleSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:49;"></div>
 
-<div class="flex h-screen overflow-hidden">
-  <!-- SIDEBAR -->
-  <aside class="sidebar-bg w-56 shrink-0 flex flex-col border-r gold-border overflow-y-auto hidden md:flex">
-    <div class="p-4 border-b gold-border">
-      <h2 class="font-cinzel text-xs tracking-widest gold-text font-bold">LITURGICAL CLUB</h2>
-      <p class="text-xs opacity-40 mt-0.5">Admin Dashboard</p>
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="p-5 border-b" style="border-color:rgba(212,175,55,0.15);">
+    <div class="flex items-center gap-2 mb-1">
+      <span style="color:var(--gold);font-size:22px;">✝</span>
+      <span class="cinzel font-bold text-sm" style="color:var(--gold);">Liturgical Club</span>
     </div>
-    <nav class="p-3 flex-1 space-y-0.5">
-      <div class="sidebar-link active" onclick="showSection('general')" id="nav-general">
-        <i data-lucide="settings-2" width="15" height="15"></i> General & Hero
-      </div>
-      <div class="sidebar-link" onclick="showSection('liturgical')" id="nav-liturgical">
-        <i data-lucide="sun" width="15" height="15"></i> Liturgical Season
-      </div>
-      <div class="sidebar-link" onclick="showSection('cards')" id="nav-cards">
-        <i data-lucide="layout-grid" width="15" height="15"></i> Info Cards
-      </div>
-      <div class="sidebar-link" onclick="showSection('ministries')" id="nav-ministries">
-        <i data-lucide="church" width="15" height="15"></i> Ministries
-      </div>
-      <div class="sidebar-link" onclick="showSection('schedules')" id="nav-schedules">
-        <i data-lucide="calendar" width="15" height="15"></i> Schedules
-      </div>
-      <div class="sidebar-link" onclick="showSection('gallery')" id="nav-gallery">
-        <i data-lucide="image" width="15" height="15"></i> Gallery
-      </div>
-      <div class="sidebar-link" onclick="showSection('officers')" id="nav-officers">
-        <i data-lucide="users" width="15" height="15"></i> Officers
-      </div>
-      <div class="sidebar-link" onclick="showSection('applications')" id="nav-applications">
-        <i data-lucide="inbox" width="15" height="15"></i> Applications
-        <span id="app-badge" class="ml-auto text-xs bg-gold text-navy px-1.5 py-0.5 rounded-full font-bold hidden"></span>
-      </div>
-    </nav>
-    <div class="p-3 border-t gold-border space-y-1">
-      <a href="/" target="_blank" class="sidebar-link text-xs opacity-60">
-        <i data-lucide="external-link" width="13" height="13"></i> View Site
-      </a>
-      <a href="/admin/logout" class="sidebar-link text-xs opacity-60">
-        <i data-lucide="log-out" width="13" height="13"></i> Logout
-      </a>
+    <p class="text-xs" style="color:var(--text-secondary);">Admin Dashboard</p>
+  </div>
+  <div class="p-3 flex flex-col gap-1 flex-1">
+    <button class="nav-item active" id="nav-overview" onclick="showSection('overview')">
+      <i data-lucide="layout-dashboard" width="16" height="16"></i> Dashboard
+    </button>
+    <button class="nav-item" id="nav-settings" onclick="showSection('settings')">
+      <i data-lucide="settings" width="16" height="16"></i> Hero, Branding &amp; Music
+    </button>
+    <button class="nav-item" id="nav-liturgical" onclick="showSection('liturgical')">
+      <i data-lucide="sun" width="16" height="16"></i> Liturgical Season
+    </button>
+    <button class="nav-item" id="nav-cards" onclick="showSection('cards')">
+      <i data-lucide="layout-grid" width="16" height="16"></i> Homepage Cards
+    </button>
+    <button class="nav-item" id="nav-ministries" onclick="showSection('ministries')">
+      <i data-lucide="church" width="16" height="16"></i> Ministries
+    </button>
+    <button class="nav-item" id="nav-schedules" onclick="showSection('schedules')">
+      <i data-lucide="calendar" width="16" height="16"></i> Schedules
+    </button>
+    <button class="nav-item" id="nav-gallery" onclick="showSection('gallery')">
+      <i data-lucide="image" width="16" height="16"></i> Gallery
+    </button>
+    <button class="nav-item" id="nav-officers" onclick="showSection('officers')">
+      <i data-lucide="users" width="16" height="16"></i> About &amp; Officers
+    </button>
+    <button class="nav-item" id="nav-applications" onclick="showSection('applications')">
+      <i data-lucide="inbox" width="16" height="16"></i> Applications Inbox
+      {% set pending_count = applications | selectattr('status', 'equalto', 'Pending') | list | length %}
+      {% if pending_count > 0 %}<span class="badge ml-auto">{{ pending_count }}</span>{% endif %}
+    </button>
+  </div>
+  <div class="p-3 border-t flex flex-col gap-2" style="border-color:rgba(212,175,55,0.15);">
+    <a href="/" target="_blank" class="nav-item" style="color:var(--text-secondary);">
+      <i data-lucide="external-link" width="14" height="14"></i> View Live Site ↗
+    </a>
+    <a href="/admin/logout" class="nav-item" style="color:#e74c3c;">
+      <i data-lucide="log-out" width="14" height="14"></i> Logout
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <!-- Topbar -->
+  <div id="topbar">
+    <div class="flex items-center gap-3">
+      <button class="md:hidden p-1" onclick="toggleSidebar()" style="color:var(--gold)"><i data-lucide="menu" width="20" height="20"></i></button>
+      <h2 class="cinzel font-bold text-base" style="color:var(--gold);" id="topbar-title">Dashboard Overview</h2>
     </div>
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <div class="flex-1 overflow-y-auto">
-    <!-- Top Bar -->
-    <header class="sticky top-0 z-10 card-bg border-b gold-border px-4 h-12 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <!-- Mobile nav toggle -->
-        <button class="md:hidden" onclick="document.getElementById('mobile-sidebar').classList.toggle('hidden')">
-          <i data-lucide="menu" width="18" height="18"></i>
-        </button>
-        <h3 id="page-title" class="font-cinzel text-sm font-bold gold-text">General & Hero</h3>
-      </div>
-      <div class="flex items-center gap-3 text-xs opacity-50">
-        <span>{{ session.username | default('admin') }}</span>
-        <a href="/admin/logout"><i data-lucide="log-out" width="14" height="14"></i></a>
-      </div>
-    </header>
-
-    <!-- Mobile Sidebar Overlay -->
-    <div id="mobile-sidebar" class="hidden fixed inset-0 z-20 bg-black/70 md:hidden" onclick="this.classList.add('hidden')">
-      <div class="sidebar-bg w-52 h-full p-3 space-y-0.5" onclick="event.stopPropagation()">
-        <div class="p-2 mb-3"><h2 class="font-cinzel text-xs tracking-widest gold-text">ADMIN</h2></div>
-        <div class="sidebar-link" onclick="showSection('general');document.getElementById('mobile-sidebar').classList.add('hidden')"><i data-lucide="settings-2" width="14" height="14"></i> General & Hero</div>
-        <div class="sidebar-link" onclick="showSection('liturgical');document.getElementById('mobile-sidebar').classList.add('hidden')"><i data-lucide="sun" width="14" height="14"></i> Liturgical Season</div>
-        <div class="sidebar-link" onclick="showSection('cards');document.getElementById('mobile-sidebar').classList.add('hidden')"><i data-lucide="layout-grid" width="14" height="14"></i> Info Cards</div>
-        <div class="sidebar-link" onclick="showSection('ministries');document.getElementById('mobile-sidebar').classList.add('hidden')"><i data-lucide="church" width="14" height="14"></i> Ministries</div>
-        <div class="sidebar-link" onclick="showSection('schedules');document.getElementById('mobile-sidebar').classList.add('hidden')"><i data-lucide="calendar" width="14" height="14"></i> Schedules</div>
-        <div class="sidebar-link" onclick="showSection('gallery');document.getElementById('mobile-sidebar').classList.add('hidden')"><i data-lucide="image" width="14" height="14"></i> Gallery</div>
-        <div class="sidebar-link" onclick="showSection('officers');document.getElementById('mobile-sidebar').classList.add('hidden')"><i data-lucide="users" width="14" height="14"></i> Officers</div>
-        <div class="sidebar-link" onclick="showSection('applications');document.getElementById('mobile-sidebar').classList.add('hidden')"><i data-lucide="inbox" width="14" height="14"></i> Applications</div>
-      </div>
+    <div class="flex items-center gap-3">
+      <span class="text-xs" style="color:var(--text-secondary);">Logged in as <strong style="color:var(--gold);">admin</strong></span>
     </div>
+  </div>
 
-    <div class="p-4 md:p-6 max-w-5xl mx-auto">
+  <div class="p-6 max-w-5xl mx-auto">
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
 
-      <!-- FLASH MESSAGES -->
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-          <div class="flash flash-{{ 'success' if category == 'success' else 'error' }}">{{ message }}</div>
+    <!-- ─── OVERVIEW ─────────────────────────────────────── -->
+    <div id="sec-overview" class="admin-section active">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {% set stats = [
+          ('Homepage Cards', cards|length, 'layout-grid'),
+          ('Ministries', ministries|length, 'church'),
+          ('Gallery Photos', gallery|length, 'image'),
+          ('Applications', applications|length, 'inbox'),
+        ] %}
+        {% for label, count, icon in stats %}
+        <div class="a-card text-center">
+          <div class="mb-2" style="color:var(--gold)"><i data-lucide="{{ icon }}" width="22" height="22" class="mx-auto"></i></div>
+          <div class="cinzel text-2xl font-black" style="color:var(--gold);">{{ count }}</div>
+          <div class="text-xs mt-1" style="color:var(--text-secondary);">{{ label }}</div>
+        </div>
         {% endfor %}
-      {% endwith %}
+      </div>
+      <div class="a-card">
+        <p class="sec-heading"><i data-lucide="zap" width="16" height="16"></i> Quick Navigation</p>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {% for section, label in [('settings','Branding & Music'),('liturgical','Liturgical Season'),('cards','Homepage Cards'),('ministries','Ministries'),('schedules','Schedules'),('gallery','Gallery'),('officers','Officers'),('applications','Applications')] %}
+          <button onclick="showSection('{{ section }}')" class="btn-outline text-left py-3 px-4">{{ label }}</button>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
 
-      <!-- ========== GENERAL & HERO ========== -->
-      <div id="section-general" class="section-panel active space-y-6">
-        <form method="POST" action="/admin/save/settings" enctype="multipart/form-data" class="space-y-6">
-          <div class="card-bg gold-border rounded-xl p-5 gold-glow">
-            <h3 class="font-cinzel text-sm font-bold gold-text mb-4">Club Info</h3>
-            <div class="grid md:grid-cols-2 gap-4">
-              <div class="form-group"><label>Club Name</label><input type="text" name="club_name" value="{{ app_data.settings.club_name | default('') }}" /></div>
-              <div class="form-group"><label>Footer Text</label><input type="text" name="footer_text" value="{{ app_data.settings.footer_text | default('© 2026 Liturgical Club | Developed by: Begie') }}" /></div>
-              <div class="form-group"><label>Facebook URL</label><input type="url" name="facebook_url" value="{{ app_data.settings.facebook_url | default('') }}" placeholder="https://facebook.com/..." /></div>
-              <div class="form-group"><label>Instagram URL</label><input type="url" name="instagram_url" value="{{ app_data.settings.instagram_url | default('') }}" placeholder="https://instagram.com/..." /></div>
+    <!-- ─── SETTINGS ──────────────────────────────────────── -->
+    <div id="sec-settings" class="admin-section" data-anchor="settings">
+      <div class="a-card">
+        <p class="sec-heading"><i data-lucide="settings" width="16" height="16"></i> Hero, Branding &amp; Music</p>
+        <form method="POST" action="/admin/save/settings" enctype="multipart/form-data">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">Site Name</label>
+              <input name="site_name" class="inp" value="{{ settings.site_name or '' }}"/>
             </div>
-          </div>
-
-          <div class="card-bg gold-border rounded-xl p-5">
-            <h3 class="font-cinzel text-sm font-bold gold-text mb-4">About / Mission / Vision</h3>
-            <div class="space-y-4">
-              <div class="form-group"><label>Club History</label><textarea name="history" rows="3">{{ app_data.settings.history | default('') }}</textarea></div>
-              <div class="form-group"><label>Mission</label><textarea name="mission" rows="2">{{ app_data.settings.mission | default('') }}</textarea></div>
-              <div class="form-group"><label>Vision</label><textarea name="vision" rows="2">{{ app_data.settings.vision | default('') }}</textarea></div>
+            <div>
+              <label class="form-label">Tagline</label>
+              <input name="tagline" class="inp" value="{{ settings.tagline or '' }}"/>
             </div>
-          </div>
-
-          <div class="card-bg gold-border rounded-xl p-5">
-            <h3 class="font-cinzel text-sm font-bold gold-text mb-4">Hero Section</h3>
-            <div class="grid md:grid-cols-2 gap-4">
-              <div class="form-group"><label>Hero Headline</label><input type="text" name="hero_headline" value="{{ app_data.settings.hero_headline | default('FAITH, REVERENCE & SERVICE') }}" /></div>
-              <div class="form-group"><label>Hero Subtitle</label><input type="text" name="hero_subtitle" value="{{ app_data.settings.hero_subtitle | default('To serve at the altar is to serve the Lord.') }}" /></div>
-              <div class="form-group"><label>Hero Image URL</label><input type="url" name="hero_image_url" value="{{ app_data.settings.hero_image_url | default('') }}" placeholder="https://..." /></div>
-              <div class="form-group"><label>Hero Image File Upload</label><input type="file" name="hero_image_file" accept="image/*" style="padding:0.3rem;" /></div>
+            <div>
+              <label class="form-label">Hero Title</label>
+              <input name="hero_title" class="inp" value="{{ settings.hero_title or '' }}"/>
             </div>
-          </div>
-
-          <div class="card-bg gold-border rounded-xl p-5">
-            <h3 class="font-cinzel text-sm font-bold gold-text mb-4 flex items-center gap-2">
-              <i data-lucide="music" width="15" height="15"></i> Background Music
-            </h3>
-            <div class="grid md:grid-cols-2 gap-4">
-              <div class="form-group">
-                <label>Enable Music</label>
-                <div class="flex items-center gap-3 mt-1">
-                  <div class="toggle-track {{ 'on' if app_data.settings.music_enabled else '' }}" id="music-toggle" onclick="toggleMusic(this)">
-                    <div class="toggle-thumb"></div>
-                  </div>
-                  <span class="text-xs opacity-60">Auto-play on page load / interaction</span>
-                </div>
-                <input type="hidden" name="music_enabled" id="music-enabled-input" value="{{ '1' if app_data.settings.music_enabled else '0' }}" />
+            <div>
+              <label class="form-label">Hero Subtitle</label>
+              <input name="hero_subtitle" class="inp" value="{{ settings.hero_subtitle or '' }}"/>
+            </div>
+            <div>
+              <label class="form-label">Hero Image URL</label>
+              <input name="hero_image_url" class="inp" placeholder="https://…" value="{{ settings.hero_image_url or '' }}"/>
+            </div>
+            <div>
+              <label class="form-label">Hero Image File (overrides URL)</label>
+              <input name="hero_image_file" type="file" accept="image/*" class="inp" style="padding:6px;"/>
+            </div>
+            <div class="md:col-span-2">
+              <label class="form-label">About Text</label>
+              <textarea name="about_text" class="inp" style="min-height:100px;">{{ settings.about_text or '' }}</textarea>
+            </div>
+            <div>
+              <label class="form-label">Footer Rainbow Text</label>
+              <input name="footer_rainbow_text" class="inp" value="{{ settings.footer_rainbow_text or '' }}"/>
+            </div>
+            <div>
+              <label class="form-label">Contact Email</label>
+              <input name="contact_email" type="email" class="inp" value="{{ settings.contact_email or '' }}"/>
+            </div>
+            <div>
+              <label class="form-label">Contact Phone</label>
+              <input name="contact_phone" class="inp" value="{{ settings.contact_phone or '' }}"/>
+            </div>
+            <div>
+              <label class="form-label">Facebook URL</label>
+              <input name="facebook_url" class="inp" value="{{ settings.facebook_url or '' }}"/>
+            </div>
+            <!-- Music -->
+            <div class="md:col-span-2 mt-4 p-4 rounded-xl" style="background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.15);">
+              <p class="text-sm font-bold mb-3" style="color:var(--gold);">🎵 Background Music</p>
+              <div class="flex items-center gap-3 mb-3">
+                <label class="toggle"><input type="checkbox" name="music_enabled" {% if settings.music_enabled %}checked{% endif %}/><span class="toggle-slider"></span></label>
+                <span class="text-sm" style="color:var(--text-secondary);">Enable Background Music</span>
               </div>
-              <div class="form-group"><label>Track Title</label><input type="text" name="music_title" value="{{ app_data.settings.music_title | default('Sacred Music') }}" placeholder="e.g. Gregorian Chant" /></div>
-              <div class="form-group"><label>Music URL (MP3/Stream)</label><input type="url" name="music_url" value="{{ app_data.settings.music_url | default('') }}" placeholder="https://..." /></div>
-              <div class="form-group"><label>Upload MP3 File</label><input type="file" name="music_file" accept="audio/*" style="padding:0.3rem;" /></div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="form-label">Music Track Title</label>
+                  <input name="music_title" class="inp" value="{{ settings.music_title or '' }}"/>
+                </div>
+                <div>
+                  <label class="form-label">Music URL</label>
+                  <input name="music_url" class="inp" placeholder="https://…mp3" value="{{ settings.music_url or '' }}"/>
+                </div>
+                <div>
+                  <label class="form-label">Music File Upload</label>
+                  <input name="music_file" type="file" accept="audio/*" class="inp" style="padding:6px;"/>
+                </div>
+              </div>
             </div>
           </div>
-
-          <div class="flex justify-end">
-            <button type="submit" class="btn-gold flex items-center gap-2">
-              <i data-lucide="save" width="14" height="14"></i> Save General Settings
-            </button>
+          <div class="mt-6 text-right">
+            <button type="submit" class="btn-gold px-8 py-2">Save Settings</button>
           </div>
         </form>
       </div>
+    </div>
 
-      <!-- ========== LITURGICAL SEASON ========== -->
-      <div id="section-liturgical" class="section-panel space-y-6">
-        <form method="POST" action="/admin/save/liturgical">
-          <div class="card-bg gold-border rounded-xl p-5 gold-glow space-y-5">
-            <h3 class="font-cinzel text-sm font-bold gold-text mb-2">Liturgical Season Override</h3>
-            <div class="flex items-center gap-4">
-              <div class="toggle-track {{ 'on' if app_data.liturgical.override else '' }}" id="lit-toggle" onclick="toggleLiturgical(this)">
-                <div class="toggle-thumb"></div>
+    <!-- ─── LITURGICAL ────────────────────────────────────── -->
+    <div id="sec-liturgical" class="admin-section" data-anchor="liturgical">
+      <div class="a-card mb-6">
+        <p class="sec-heading"><i data-lucide="sun" width="16" height="16"></i> Current Auto-Detected Season</p>
+        {% set color_map = {'green':'#2E7D32','purple':'#6B2D8B','gold':'#D4AF37','red':'#C0392B','white':'#E0E0E0','rose':'#FF6B9D'} %}
+        <div class="flex items-center gap-3 p-4 rounded-xl" style="background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.15);">
+          <span class="color-dot" style="background:{{ color_map.get(liturgical.color,'#2E7D32') }};box-shadow:0 0 8px {{ color_map.get(liturgical.color,'#2E7D32') }};"></span>
+          <div>
+            <p class="font-bold text-sm" style="color:var(--gold);">{{ liturgical.week_label }}</p>
+            <p class="text-xs" style="color:var(--text-secondary);">Season: {{ liturgical.season }} · Vestment: {{ liturgical.color }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="a-card">
+        <p class="sec-heading"><i data-lucide="edit" width="16" height="16"></i> Manual Override</p>
+        <form method="POST" action="/admin/save/settings" enctype="multipart/form-data">
+          <!-- Pass through required settings fields as hidden to avoid overwriting -->
+          <input type="hidden" name="site_name" value="{{ settings.site_name or '' }}"/>
+          <input type="hidden" name="tagline" value="{{ settings.tagline or '' }}"/>
+          <input type="hidden" name="hero_title" value="{{ settings.hero_title or '' }}"/>
+          <input type="hidden" name="hero_subtitle" value="{{ settings.hero_subtitle or '' }}"/>
+          <input type="hidden" name="about_text" value="{{ settings.about_text or '' }}"/>
+          <input type="hidden" name="footer_rainbow_text" value="{{ settings.footer_rainbow_text or '' }}"/>
+          <input type="hidden" name="contact_email" value="{{ settings.contact_email or '' }}"/>
+          <input type="hidden" name="contact_phone" value="{{ settings.contact_phone or '' }}"/>
+          <input type="hidden" name="facebook_url" value="{{ settings.facebook_url or '' }}"/>
+          <input type="hidden" name="music_title" value="{{ settings.music_title or '' }}"/>
+          <input type="hidden" name="music_url" value="{{ settings.music_url or '' }}"/>
+          {% if settings.music_enabled %}<input type="hidden" name="music_enabled" value="on"/>{% endif %}
+          <div class="flex items-center gap-3 mb-4">
+            <label class="toggle"><input type="checkbox" name="liturgical_override_enabled" id="override-toggle" {% if settings.liturgical_override_enabled %}checked{% endif %} onchange="document.getElementById('override-fields').style.display=this.checked?'block':'none'"/><span class="toggle-slider"></span></label>
+            <span class="text-sm" style="color:var(--text-secondary);">Enable Manual Override</span>
+          </div>
+          <div id="override-fields" style="display:{{ 'block' if settings.liturgical_override_enabled else 'none' }};">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="form-label">Override Label</label>
+                <input name="liturgical_override_text" class="inp" placeholder="e.g. 33rd Week in Ordinary Time" value="{{ settings.liturgical_override_text or '' }}"/>
               </div>
               <div>
-                <p class="text-sm font-medium">Manual Override</p>
-                <p class="text-xs opacity-50">When off, season is auto-calculated from the liturgical calendar.</p>
-              </div>
-              <input type="hidden" name="override" id="lit-override-input" value="{{ '1' if app_data.liturgical.override else '0' }}" />
-            </div>
-            <div id="lit-manual-fields" class="{{ '' if app_data.liturgical.override else 'opacity-40 pointer-events-none' }} space-y-4 transition-all">
-              <div class="form-group">
-                <label>Custom Season Label</label>
-                <input type="text" name="custom_label" value="{{ app_data.liturgical.custom_label | default('') }}" placeholder="e.g. 33rd Week in Ordinary Time" />
-              </div>
-              <div class="form-group">
-                <label>Vestment Color</label>
-                <div class="flex items-center gap-3 mt-2 flex-wrap">
-                  <input type="color" name="color" id="lit-color-input" value="{{ app_data.liturgical.color | default('#16a34a') }}" class="w-10 h-10 border-none rounded-lg cursor-pointer p-0" style="padding:0;width:36px;height:36px;" />
-                  <div class="color-row">
-                    {% for col in ['#16a34a','#7c3aed','#dc2626','#fbbf24','#ffffff','#000000','#f97316'] %}
-                    <div class="color-swatch {{ 'selected' if app_data.liturgical.color == col else '' }}" style="background:{{ col }}" onclick="pickVestmentColor('{{ col }}')"></div>
-                    {% endfor %}
-                  </div>
-                </div>
-                <div class="flex gap-3 mt-2 text-xs opacity-50 flex-wrap">
-                  <span style="color:#16a34a">● Ordinary Time</span>
-                  <span style="color:#7c3aed">● Lent / Advent</span>
-                  <span style="color:#dc2626">● Pentecost / Martyrs</span>
-                  <span style="color:#fbbf24">● Easter / Feasts</span>
-                  <span style="color:#ffffff">● Christmas / Epiphany</span>
-                </div>
-              </div>
-            </div>
-            <div class="flex justify-end">
-              <button type="submit" class="btn-gold flex items-center gap-2">
-                <i data-lucide="save" width="14" height="14"></i> Save Liturgical Settings
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <!-- ========== INFO CARDS ========== -->
-      <div id="section-cards" class="section-panel space-y-5">
-        <div class="flex items-center justify-between">
-          <h3 class="font-cinzel text-sm font-bold gold-text">Info Cards</h3>
-          <button onclick="openModal('modal-card')" class="btn-gold btn-sm flex items-center gap-1"><i data-lucide="plus" width="13" height="13"></i> Add Card</button>
-        </div>
-        <div id="cards-list" class="space-y-2">
-          {% for card in app_data.cards %}
-          <div class="table-row grid-cols-[2rem_1fr_auto] card-bg">
-            <span class="text-xl">{{ card.icon | default('✦') }}</span>
-            <div>
-              <p class="text-sm font-semibold">{{ card.title }}</p>
-              <p class="text-xs opacity-50 truncate max-w-xs">{{ card.body }}</p>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="editCard({{ loop.index0 }})" class="btn-outline btn-sm">Edit</button>
-              <form method="POST" action="/admin/delete/cards/{{ card.id }}" onsubmit="return confirm('Delete this card?');" style="display:inline;">
-                <button type="submit" class="btn-danger">Del</button>
-              </form>
-            </div>
-          </div>
-          {% else %}
-          <p class="text-sm opacity-40 py-6 text-center">No info cards yet.</p>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- ========== MINISTRIES ========== -->
-      <div id="section-ministries" class="section-panel space-y-5">
-        <div class="flex items-center justify-between">
-          <h3 class="font-cinzel text-sm font-bold gold-text">Ministries</h3>
-          <button onclick="openModal('modal-ministry')" class="btn-gold btn-sm flex items-center gap-1"><i data-lucide="plus" width="13" height="13"></i> Add Ministry</button>
-        </div>
-        <div class="space-y-2">
-          {% for m in app_data.ministries %}
-          <div class="table-row grid-cols-[2rem_1fr_auto] card-bg">
-            <span class="text-xl">{{ m.icon | default('⛪') }}</span>
-            <div>
-              <p class="text-sm font-semibold">{{ m.name }}</p>
-              <p class="text-xs opacity-50 truncate max-w-xs">{{ m.description }}</p>
-              <p class="text-xs opacity-40">{{ m.schedule }}</p>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="editMinistry({{ loop.index0 }})" class="btn-outline btn-sm">Edit</button>
-              <form method="POST" action="/admin/delete/ministries/{{ m.id }}" onsubmit="return confirm('Delete?');" style="display:inline;">
-                <button type="submit" class="btn-danger">Del</button>
-              </form>
-            </div>
-          </div>
-          {% else %}
-          <p class="text-sm opacity-40 py-6 text-center">No ministries yet.</p>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- ========== SCHEDULES ========== -->
-      <div id="section-schedules" class="section-panel space-y-5">
-        <div class="flex items-center justify-between">
-          <h3 class="font-cinzel text-sm font-bold gold-text">Schedules</h3>
-          <button onclick="openModal('modal-schedule')" class="btn-gold btn-sm flex items-center gap-1"><i data-lucide="plus" width="13" height="13"></i> Add Schedule</button>
-        </div>
-        <div class="space-y-2">
-          {% for s in app_data.schedules %}
-          {% set type_class = {'mass':'text-red-400','formation':'text-blue-400','event':'text-gold'} %}
-          <div class="table-row grid-cols-[80px_1fr_auto] card-bg">
-            <span class="text-xs {{ type_class.get(s.type, 'text-gold') }} font-semibold capitalize">{{ s.type }}</span>
-            <div>
-              <p class="text-sm font-semibold">{{ s.title }}</p>
-              <p class="text-xs opacity-50">{{ s.datetime }} {% if s.location %}· {{ s.location }}{% endif %}</p>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="editSchedule({{ loop.index0 }})" class="btn-outline btn-sm">Edit</button>
-              <form method="POST" action="/admin/delete/schedules/{{ s.id }}" onsubmit="return confirm('Delete?');" style="display:inline;">
-                <button type="submit" class="btn-danger">Del</button>
-              </form>
-            </div>
-          </div>
-          {% else %}
-          <p class="text-sm opacity-40 py-6 text-center">No schedules yet.</p>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- ========== GALLERY ========== -->
-      <div id="section-gallery" class="section-panel space-y-5">
-        <div class="flex items-center justify-between">
-          <h3 class="font-cinzel text-sm font-bold gold-text">Gallery</h3>
-          <button onclick="openModal('modal-gallery')" class="btn-gold btn-sm flex items-center gap-1"><i data-lucide="plus" width="13" height="13"></i> Add Photo</button>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {% for g in app_data.gallery %}
-          <div class="relative group card-bg gold-border rounded-xl overflow-hidden aspect-square">
-            <img src="{{ g.url }}" alt="{{ g.caption }}" class="w-full h-full object-cover" onerror="this.style.opacity=0.2" />
-            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
-              <p class="text-xs text-white text-center truncate w-full">{{ g.caption }}</p>
-              <form method="POST" action="/admin/delete/gallery/{{ g.id }}" onsubmit="return confirm('Remove photo?');" class="mt-1">
-                <button type="submit" class="btn-danger text-xs">Remove</button>
-              </form>
-            </div>
-          </div>
-          {% else %}
-          <p class="col-span-4 text-sm opacity-40 py-6 text-center">No gallery images yet.</p>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- ========== OFFICERS ========== -->
-      <div id="section-officers" class="section-panel space-y-5">
-        <div class="flex items-center justify-between">
-          <h3 class="font-cinzel text-sm font-bold gold-text">Officers</h3>
-          <button onclick="openModal('modal-officer')" class="btn-gold btn-sm flex items-center gap-1"><i data-lucide="plus" width="13" height="13"></i> Add Officer</button>
-        </div>
-        <div class="space-y-2">
-          {% for o in app_data.officers %}
-          <div class="table-row grid-cols-[48px_1fr_auto] card-bg items-center">
-            <div class="w-10 h-10 rounded-full border border-gold/30 overflow-hidden bg-navy-card flex items-center justify-center">
-              {% if o.photo_url %}<img src="{{ o.photo_url }}" alt="{{ o.name }}" class="w-full h-full object-cover" onerror="this.style.display='none'" />{% endif %}
-            </div>
-            <div>
-              <p class="text-sm font-semibold">{{ o.name }}</p>
-              <p class="text-xs opacity-50">{{ o.position }}</p>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="editOfficer({{ loop.index0 }})" class="btn-outline btn-sm">Edit</button>
-              <form method="POST" action="/admin/delete/officers/{{ o.id }}" onsubmit="return confirm('Delete?');" style="display:inline;">
-                <button type="submit" class="btn-danger">Del</button>
-              </form>
-            </div>
-          </div>
-          {% else %}
-          <p class="text-sm opacity-40 py-6 text-center">No officers listed yet.</p>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- ========== APPLICATIONS ========== -->
-      <div id="section-applications" class="section-panel space-y-5">
-        <div class="flex items-center justify-between">
-          <h3 class="font-cinzel text-sm font-bold gold-text">Join Applications</h3>
-          <span class="text-xs opacity-50">{{ app_data.applications | length }} total</span>
-        </div>
-        <div class="space-y-3">
-          {% for a in app_data.applications %}
-          <div class="card-bg gold-border rounded-xl p-4">
-            <div class="flex items-start justify-between gap-3 flex-wrap">
-              <div>
-                <p class="font-semibold text-sm">{{ a.name }}</p>
-                <p class="text-xs opacity-60">{{ a.email }} {% if a.contact %}· {{ a.contact }}{% endif %}</p>
-                <p class="text-xs opacity-50 mt-0.5">Ministry: {{ a.ministry or '—' }} &nbsp;|&nbsp; {{ a.year_level or '' }} &nbsp;|&nbsp; {{ a.created_at or '' }}</p>
-              </div>
-              <span class="badge badge-{{ a.status | lower | default('pending') }}">{{ a.status | default('Pending') }}</span>
-            </div>
-            {% if a.message %}
-            <p class="text-xs mt-2 opacity-60 italic border-l-2 border-gold/20 pl-3">{{ a.message }}</p>
-            {% endif %}
-            <div class="flex gap-2 mt-3 flex-wrap">
-              <form method="POST" action="/admin/applications/{{ a.id }}/status" class="flex gap-2">
-                <select name="status" class="text-xs py-1 px-2" style="width:auto;">
-                  <option value="Pending" {{ 'selected' if a.status=='Pending' else '' }}>Pending</option>
-                  <option value="Approved" {{ 'selected' if a.status=='Approved' else '' }}>Approved</option>
-                  <option value="Contacted" {{ 'selected' if a.status=='Contacted' else '' }}>Contacted</option>
+                <label class="form-label">Vestment Color</label>
+                <select name="liturgical_override_color" class="inp">
+                  {% for col in ['green','purple','gold','red','white','rose'] %}
+                  <option value="{{ col }}" {% if settings.liturgical_override_color == col %}selected{% endif %}>{{ col|capitalize }}</option>
+                  {% endfor %}
                 </select>
-                <button type="submit" class="btn-outline btn-sm">Update</button>
-              </form>
-              <form method="POST" action="/admin/delete/applications/{{ a.id }}" onsubmit="return confirm('Delete this application?');">
-                <button type="submit" class="btn-danger">Delete</button>
-              </form>
+              </div>
             </div>
           </div>
-          {% else %}
-          <p class="text-sm opacity-40 py-10 text-center">No applications yet.</p>
-          {% endfor %}
+          <div class="mt-4 text-right">
+            <button type="submit" class="btn-gold px-8 py-2">Save Season Override</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ─── CARDS ─────────────────────────────────────────── -->
+    <div id="sec-cards" class="admin-section" data-anchor="cards">
+      <div class="flex items-center justify-between mb-4">
+        <p class="sec-heading mb-0"><i data-lucide="layout-grid" width="16" height="16"></i> Homepage Cards</p>
+        <button class="btn-gold px-4 py-2" onclick="openModal('modal-card-new')">+ Add New</button>
+      </div>
+      <div class="a-card">
+        {% for c in cards %}
+        <div class="item-row">
+          <div class="text-2xl" style="min-width:32px;">{{ c.icon or '✝' }}</div>
+          <div class="flex-1">
+            <p class="font-semibold text-sm" style="color:var(--gold);">{{ c.title }}</p>
+            <p class="text-xs mt-1" style="color:var(--text-secondary);">{{ c.body[:100] }}{% if c.body|length > 100 %}…{% endif %}</p>
+          </div>
+          <div class="flex gap-2 shrink-0">
+            <button class="btn-outline" onclick="openEditCard({{ c.id }}, '{{ c.title|replace("'","\\'")|replace('"','&quot;') }}', '{{ c.body|replace("'","\\'")|replace('"','&quot;')|replace('\n',' ') }}', '{{ c.icon or '✝' }}', {{ c.order_index }})">Edit</button>
+            <form method="POST" action="/admin/delete/cards/{{ c.id }}" onsubmit="return confirm('Delete this card?')">
+              <button type="submit" class="btn-danger">Delete</button>
+            </form>
+          </div>
         </div>
+        {% else %}
+        <p class="text-sm" style="color:var(--text-secondary);">No cards yet. Add your first.</p>
+        {% endfor %}
       </div>
-
-    </div><!-- /content -->
-  </div><!-- /main -->
-</div><!-- /flex -->
-
-<!-- ========== MODALS ========== -->
-
-<!-- Card Modal -->
-<div id="modal-card" class="modal-overlay">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="font-cinzel text-sm font-bold gold-text" id="modal-card-title">Add Info Card</h3>
-      <button onclick="closeModal('modal-card')" class="opacity-50 hover:opacity-100"><i data-lucide="x" width="18" height="18"></i></button>
     </div>
-    <form method="POST" id="card-form" action="/admin/save/cards" class="space-y-4">
-      <input type="hidden" name="card_id" id="card-id-input" value="" />
-      <div class="form-group"><label>Icon (Emoji)</label><input type="text" name="icon" id="card-icon" placeholder="✦" maxlength="4" /></div>
-      <div class="form-group"><label>Title</label><input type="text" name="title" id="card-title" required /></div>
-      <div class="form-group"><label>Body Text</label><textarea name="body" id="card-body" rows="3" required></textarea></div>
-      <div class="flex justify-end gap-2">
-        <button type="button" onclick="closeModal('modal-card')" class="btn-outline">Cancel</button>
-        <button type="submit" class="btn-gold">Save Card</button>
+
+    <!-- ─── MINISTRIES ────────────────────────────────────── -->
+    <div id="sec-ministries" class="admin-section" data-anchor="ministries">
+      <div class="flex items-center justify-between mb-4">
+        <p class="sec-heading mb-0"><i data-lucide="church" width="16" height="16"></i> Ministries</p>
+        <button class="btn-gold px-4 py-2" onclick="openModal('modal-ministry-new')">+ Add New</button>
+      </div>
+      <div class="a-card">
+        {% for m in ministries %}
+        <div class="item-row">
+          <div class="shrink-0">
+            {% if m.image_url %}
+              <img src="{{ m.image_url }}" alt="{{ m.name }}" class="w-14 h-14 object-cover rounded-lg"/>
+            {% else %}
+              <div class="w-14 h-14 rounded-lg flex items-center justify-center text-2xl" style="background:rgba(212,175,55,0.1);">⛪</div>
+            {% endif %}
+          </div>
+          <div class="flex-1">
+            <p class="font-semibold text-sm" style="color:var(--gold);">{{ m.name }}</p>
+            <p class="text-xs mt-1" style="color:var(--text-secondary);">{{ m.description[:90] }}{% if m.description|length > 90 %}…{% endif %}</p>
+          </div>
+          <div class="flex gap-2 shrink-0">
+            <button class="btn-outline" onclick="openEditMinistry({{ m.id }}, `{{ m.name|replace('`','\\`') }}`, `{{ m.description|replace('`','\\`') }}`, `{{ m.image_url or '' }}`, {{ m.order_index }})">Edit</button>
+            <form method="POST" action="/admin/delete/ministries/{{ m.id }}" onsubmit="return confirm('Delete this ministry?')">
+              <button type="submit" class="btn-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+        {% else %}
+        <p class="text-sm" style="color:var(--text-secondary);">No ministries yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ─── SCHEDULES ─────────────────────────────────────── -->
+    <div id="sec-schedules" class="admin-section" data-anchor="schedules">
+      <div class="flex items-center justify-between mb-4">
+        <p class="sec-heading mb-0"><i data-lucide="calendar" width="16" height="16"></i> Schedules</p>
+        <button class="btn-gold px-4 py-2" onclick="openModal('modal-schedule-new')">+ Add New</button>
+      </div>
+      <div class="a-card">
+        {% for s in schedules %}
+        <div class="item-row">
+          <div style="color:var(--gold);min-width:24px;"><i data-lucide="clock" width="18" height="18"></i></div>
+          <div class="flex-1">
+            <p class="font-semibold text-sm" style="color:var(--gold);">{{ s.title }}</p>
+            <p class="text-xs mt-0.5 font-semibold" style="color:var(--text-secondary);">{{ s.day_time }}{% if s.location %} · {{ s.location }}{% endif %}</p>
+            <p class="text-xs mt-1" style="color:var(--text-secondary);">{{ s.description[:80] }}{% if s.description|length > 80 %}…{% endif %}</p>
+          </div>
+          <div class="flex gap-2 shrink-0">
+            <button class="btn-outline" onclick="openEditSchedule({{ s.id }}, `{{ s.title|replace('`','\\`') }}`, `{{ s.day_time|replace('`','\\`') }}`, `{{ s.location|replace('`','\\`') }}`, `{{ s.description|replace('`','\\`') }}`, {{ s.order_index }})">Edit</button>
+            <form method="POST" action="/admin/delete/schedules/{{ s.id }}" onsubmit="return confirm('Delete?')">
+              <button type="submit" class="btn-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+        {% else %}
+        <p class="text-sm" style="color:var(--text-secondary);">No schedules yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ─── GALLERY ───────────────────────────────────────── -->
+    <div id="sec-gallery" class="admin-section" data-anchor="gallery">
+      <div class="flex items-center justify-between mb-4">
+        <p class="sec-heading mb-0"><i data-lucide="image" width="16" height="16"></i> Gallery</p>
+        <button class="btn-gold px-4 py-2" onclick="openModal('modal-gallery-new')">+ Add New</button>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {% for g in gallery %}
+        <div class="a-card p-3">
+          <div class="overflow-hidden rounded-lg mb-2">
+            <img src="{{ g.image_url }}" alt="{{ g.title }}" class="w-full h-32 object-cover"/>
+          </div>
+          <p class="text-xs font-semibold mb-1 truncate" style="color:var(--gold);">{{ g.title }}</p>
+          <p class="text-xs mb-2 leading-4" style="color:var(--text-secondary);">{{ g.caption[:60] }}{% if g.caption|length > 60 %}…{% endif %}</p>
+          <div class="flex gap-2">
+            <button class="btn-outline flex-1" onclick="openEditGallery({{ g.id }}, `{{ g.title|replace('`','\\`') }}`, `{{ g.caption|replace('`','\\`') }}`, `{{ g.image_url|replace('`','\\`') }}`, {{ g.order_index }})">Edit</button>
+            <form method="POST" action="/admin/delete/gallery/{{ g.id }}" onsubmit="return confirm('Delete photo?')">
+              <button type="submit" class="btn-danger">Del</button>
+            </form>
+          </div>
+        </div>
+        {% else %}
+        <p class="text-sm col-span-3" style="color:var(--text-secondary);">No gallery items yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ─── OFFICERS ──────────────────────────────────────── -->
+    <div id="sec-officers" class="admin-section" data-anchor="officers">
+      <div class="flex items-center justify-between mb-4">
+        <p class="sec-heading mb-0"><i data-lucide="users" width="16" height="16"></i> Officers</p>
+        <button class="btn-gold px-4 py-2" onclick="openModal('modal-officer-new')">+ Add New</button>
+      </div>
+      <div class="a-card">
+        {% for o in officers %}
+        <div class="item-row">
+          <div class="shrink-0">
+            {% if o.image_url %}
+              <img src="{{ o.image_url }}" alt="{{ o.name }}" class="w-12 h-12 rounded-full object-cover"/>
+            {% else %}
+              <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl" style="background:rgba(212,175,55,0.1);">👤</div>
+            {% endif %}
+          </div>
+          <div class="flex-1">
+            <p class="font-semibold text-sm" style="color:var(--gold);">{{ o.name }}</p>
+            <p class="text-xs mt-0.5 font-semibold" style="color:var(--text-secondary);">{{ o.position }}</p>
+            <p class="text-xs mt-1" style="color:var(--text-secondary);">{{ o.bio[:80] }}{% if o.bio|length > 80 %}…{% endif %}</p>
+          </div>
+          <div class="flex gap-2 shrink-0">
+            <button class="btn-outline" onclick="openEditOfficer({{ o.id }}, `{{ o.name|replace('`','\\`') }}`, `{{ o.position|replace('`','\\`') }}`, `{{ o.bio|replace('`','\\`') }}`, `{{ o.image_url|replace('`','\\`') }}`, {{ o.order_index }})">Edit</button>
+            <form method="POST" action="/admin/delete/officers/{{ o.id }}" onsubmit="return confirm('Delete officer?')">
+              <button type="submit" class="btn-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+        {% else %}
+        <p class="text-sm" style="color:var(--text-secondary);">No officers yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ─── APPLICATIONS ──────────────────────────────────── -->
+    <div id="sec-applications" class="admin-section" data-anchor="applications">
+      <p class="sec-heading"><i data-lucide="inbox" width="16" height="16"></i> Applications Inbox
+        {% if pending_count > 0 %}<span class="badge">{{ pending_count }} Pending</span>{% endif %}
+      </p>
+      <div class="flex flex-col gap-4">
+        {% for a in applications %}
+        <div class="a-card">
+          <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+            <div>
+              <p class="font-bold text-sm" style="color:var(--gold);">{{ a.full_name }}</p>
+              <p class="text-xs" style="color:var(--text-secondary);">{{ a.email }}{% if a.age %} · Age {{ a.age }}{% endif %}{% if a.contact %} · {{ a.contact }}{% endif %}</p>
+              <p class="text-xs mt-0.5" style="color:var(--text-secondary);">
+                Ministry: <strong style="color:var(--text-primary);">{{ a.ministry or '—' }}</strong>
+                {% if a.created_at %} · Applied: {{ a.created_at.strftime('%b %d, %Y') }}{% endif %}
+              </p>
+            </div>
+            <span class="status-badge status-{{ a.status|lower }}">{{ a.status }}</span>
+          </div>
+          {% if a.experience %}
+          <p class="text-xs mb-2" style="color:var(--text-secondary);"><strong style="color:var(--text-primary);">Experience:</strong> {{ a.experience[:200] }}{% if a.experience|length > 200 %}…{% endif %}</p>
+          {% endif %}
+          {% if a.note %}
+          <p class="text-xs mb-2" style="color:var(--text-secondary);"><strong style="color:var(--text-primary);">Note:</strong> {{ a.note[:200] }}{% if a.note|length > 200 %}…{% endif %}</p>
+          {% endif %}
+          {% if a.verse_sent %}
+          <div class="rounded-lg p-3 mb-3 text-xs" style="background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.2);">
+            <span class="font-bold" style="color:var(--gold);">✦ Bible Verse Sent: </span>
+            <span style="color:var(--text-secondary);">{{ a.verse_sent }}</span>
+          </div>
+          {% endif %}
+          <div class="flex flex-wrap gap-2 items-center">
+            <form method="POST" action="/admin/save/applications" class="flex items-center gap-2">
+              <input type="hidden" name="id" value="{{ a.id }}"/>
+              <select name="status" class="inp" style="width:auto;padding:6px 10px;font-size:12px;">
+                <option value="Pending" {% if a.status=='Pending' %}selected{% endif %}>Pending</option>
+                <option value="Approved" {% if a.status=='Approved' %}selected{% endif %}>Approved</option>
+                <option value="Rejected" {% if a.status=='Rejected' %}selected{% endif %}>Rejected</option>
+              </select>
+              <button type="submit" class="btn-gold px-4 py-1.5 text-xs">Update Status</button>
+            </form>
+            <form method="POST" action="/admin/delete/applications/{{ a.id }}" onsubmit="return confirm('Delete this application?')">
+              <button type="submit" class="btn-danger text-xs">Delete</button>
+            </form>
+          </div>
+        </div>
+        {% else %}
+        <div class="a-card text-center py-8">
+          <p class="text-sm" style="color:var(--text-secondary);">No applications yet.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div><!-- /inner padding -->
+</div><!-- /main -->
+
+<!-- ═══════════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════════ -->
+
+<!-- Card NEW -->
+<div id="modal-card-new" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('modal-card-new')">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="cinzel font-bold text-base" style="color:var(--gold);">Add Homepage Card</h3>
+      <button onclick="closeModal('modal-card-new')" style="color:var(--text-secondary);"><i data-lucide="x" width="18" height="18"></i></button>
+    </div>
+    <form method="POST" action="/admin/save/cards">
+      <div class="grid gap-4">
+        <div><label class="form-label">Title</label><input name="title" class="inp" required/></div>
+        <div><label class="form-label">Icon (emoji)</label><input name="icon" class="inp" value="✝"/></div>
+        <div><label class="form-label">Body Text</label><textarea name="body" class="inp" required></textarea></div>
+        <div><label class="form-label">Order Index</label><input name="order_index" type="number" class="inp" value="0"/></div>
+      </div>
+      <div class="mt-4 flex gap-3 justify-end">
+        <button type="button" onclick="closeModal('modal-card-new')" class="btn-outline">Cancel</button>
+        <button type="submit" class="btn-gold px-6 py-2">Add Card</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Ministry Modal -->
-<div id="modal-ministry" class="modal-overlay">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="font-cinzel text-sm font-bold gold-text">Add / Edit Ministry</h3>
-      <button onclick="closeModal('modal-ministry')" class="opacity-50 hover:opacity-100"><i data-lucide="x" width="18" height="18"></i></button>
+<!-- Card EDIT -->
+<div id="modal-card-edit" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('modal-card-edit')">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="cinzel font-bold text-base" style="color:var(--gold);">Edit Homepage Card</h3>
+      <button onclick="closeModal('modal-card-edit')" style="color:var(--text-secondary);"><i data-lucide="x" width="18" height="18"></i></button>
     </div>
-    <form method="POST" action="/admin/save/ministries" class="space-y-4">
-      <input type="hidden" name="ministry_id" id="ministry-id-input" />
-      <div class="form-group"><label>Icon (Emoji)</label><input type="text" name="icon" id="ministry-icon" placeholder="⛪" maxlength="4" /></div>
-      <div class="form-group"><label>Ministry Name</label><input type="text" name="name" id="ministry-name" required /></div>
-      <div class="form-group"><label>Description</label><textarea name="description" id="ministry-desc" rows="3"></textarea></div>
-      <div class="form-group"><label>Schedule</label><input type="text" name="schedule" id="ministry-schedule" placeholder="Every Sunday 7AM" /></div>
-      <div class="form-group"><label>Requirements</label><input type="text" name="requirements" id="ministry-reqs" placeholder="Must be a registered member" /></div>
-      <div class="flex justify-end gap-2">
-        <button type="button" onclick="closeModal('modal-ministry')" class="btn-outline">Cancel</button>
-        <button type="submit" class="btn-gold">Save Ministry</button>
+    <form method="POST" action="/admin/save/cards">
+      <input type="hidden" name="id" id="edit-card-id"/>
+      <div class="grid gap-4">
+        <div><label class="form-label">Title</label><input name="title" id="edit-card-title" class="inp" required/></div>
+        <div><label class="form-label">Icon (emoji)</label><input name="icon" id="edit-card-icon" class="inp"/></div>
+        <div><label class="form-label">Body Text</label><textarea name="body" id="edit-card-body" class="inp" required></textarea></div>
+        <div><label class="form-label">Order Index</label><input name="order_index" id="edit-card-order" type="number" class="inp"/></div>
+      </div>
+      <div class="mt-4 flex gap-3 justify-end">
+        <button type="button" onclick="closeModal('modal-card-edit')" class="btn-outline">Cancel</button>
+        <button type="submit" class="btn-gold px-6 py-2">Save Changes</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Schedule Modal -->
-<div id="modal-schedule" class="modal-overlay">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="font-cinzel text-sm font-bold gold-text">Add / Edit Schedule</h3>
-      <button onclick="closeModal('modal-schedule')" class="opacity-50 hover:opacity-100"><i data-lucide="x" width="18" height="18"></i></button>
+<!-- Ministry NEW -->
+<div id="modal-ministry-new" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('modal-ministry-new')">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="cinzel font-bold text-base" style="color:var(--gold);">Add Ministry</h3>
+      <button onclick="closeModal('modal-ministry-new')" style="color:var(--text-secondary);"><i data-lucide="x" width="18" height="18"></i></button>
     </div>
-    <form method="POST" action="/admin/save/schedules" class="space-y-4">
-      <input type="hidden" name="schedule_id" id="schedule-id-input" />
-      <div class="form-group"><label>Title</label><input type="text" name="title" id="sched-title" required /></div>
-      <div class="form-group">
-        <label>Type</label>
-        <select name="type" id="sched-type">
-          <option value="mass">Mass</option>
-          <option value="formation">Formation</option>
-          <option value="event">Event</option>
-        </select>
+    <form method="POST" action="/admin/save/ministries" enctype="multipart/form-data">
+      <div class="grid gap-4">
+        <div><label class="form-label">Name</label><input name="name" class="inp" required/></div>
+        <div><label class="form-label">Description</label><textarea name="description" class="inp" required></textarea></div>
+        <div><label class="form-label">Image URL</label><input name="image_url" class="inp" placeholder="https://…"/></div>
+        <div><label class="form-label">Image File (overrides URL)</label><input name="image_file" type="file" accept="image/*" class="inp" style="padding:6px;"/></div>
+        <div><label class="form-label">Order Index</label><input name="order_index" type="number" class="inp" value="0"/></div>
       </div>
-      <div class="form-group"><label>Date &amp; Time</label><input type="text" name="datetime" id="sched-datetime" placeholder="Sunday, Nov 17 · 8:00 AM" /></div>
-      <div class="form-group"><label>Location</label><input type="text" name="location" id="sched-location" placeholder="Parish Church, Main Hall" /></div>
-      <div class="form-group"><label>Notes</label><textarea name="notes" id="sched-notes" rows="2"></textarea></div>
-      <div class="flex justify-end gap-2">
-        <button type="button" onclick="closeModal('modal-schedule')" class="btn-outline">Cancel</button>
-        <button type="submit" class="btn-gold">Save Schedule</button>
+      <div class="mt-4 flex gap-3 justify-end">
+        <button type="button" onclick="closeModal('modal-ministry-new')" class="btn-outline">Cancel</button>
+        <button type="submit" class="btn-gold px-6 py-2">Add Ministry</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Gallery Modal -->
-<div id="modal-gallery" class="modal-overlay">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="font-cinzel text-sm font-bold gold-text">Add Gallery Photo</h3>
-      <button onclick="closeModal('modal-gallery')" class="opacity-50 hover:opacity-100"><i data-lucide="x" width="18" height="18"></i></button>
+<!-- Ministry EDIT -->
+<div id="modal-ministry-edit" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('modal-ministry-edit')">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="cinzel font-bold text-base" style="color:var(--gold);">Edit Ministry</h3>
+      <button onclick="closeModal('modal-ministry-edit')" style="color:var(--text-secondary);"><i data-lucide="x" width="18" height="18"></i></button>
     </div>
-    <form method="POST" action="/admin/save/gallery" enctype="multipart/form-data" class="space-y-4">
-      <div class="form-group"><label>Image URL</label><input type="url" name="url" id="gallery-url" placeholder="https://..." /></div>
-      <div class="form-group"><label>Or Upload Image File</label><input type="file" name="gallery_file" accept="image/*" style="padding:0.3rem;" /></div>
-      <div class="form-group"><label>Caption</label><input type="text" name="caption" id="gallery-caption" placeholder="Brief description" /></div>
-      <div class="flex justify-end gap-2">
-        <button type="button" onclick="closeModal('modal-gallery')" class="btn-outline">Cancel</button>
-        <button type="submit" class="btn-gold">Add Photo</button>
+    <form method="POST" action="/admin/save/ministries" enctype="multipart/form-data">
+      <input type="hidden" name="id" id="edit-ministry-id"/>
+      <div class="grid gap-4">
+        <div><label class="form-label">Name</label><input name="name" id="edit-ministry-name" class="inp" required/></div>
+        <div><label class="form-label">Description</label><textarea name="description" id="edit-ministry-desc" class="inp" required></textarea></div>
+        <div><label class="form-label">Image URL</label><input name="image_url" id="edit-ministry-img" class="inp"/></div>
+        <div><label class="form-label">Replace Image File</label><input name="image_file" type="file" accept="image/*" class="inp" style="padding:6px;"/></div>
+        <div><label class="form-label">Order Index</label><input name="order_index" id="edit-ministry-order" type="number" class="inp"/></div>
+      </div>
+      <div class="mt-4 flex gap-3 justify-end">
+        <button type="button" onclick="closeModal('modal-ministry-edit')" class="btn-outline">Cancel</button>
+        <button type="submit" class="btn-gold px-6 py-2">Save Changes</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Officer Modal -->
-<div id="modal-officer" class="modal-overlay">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="font-cinzel text-sm font-bold gold-text">Add / Edit Officer</h3>
-      <button onclick="closeModal('modal-officer')" class="opacity-50 hover:opacity-100"><i data-lucide="x" width="18" height="18"></i></button>
+<!-- Schedule NEW -->
+<div id="modal-schedule-new" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('modal-schedule-new')">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="cinzel font-bold text-base" style="color:var(--gold);">Add Schedule</h3>
+      <button onclick="closeModal('modal-schedule-new')" style="color:var(--text-secondary);"><i data-lucide="x" width="18" height="18"></i></button>
     </div>
-    <form method="POST" action="/admin/save/officers" enctype="multipart/form-data" class="space-y-4">
-      <input type="hidden" name="officer_id" id="officer-id-input" />
-      <div class="form-group"><label>Full Name</label><input type="text" name="name" id="officer-name" required /></div>
-      <div class="form-group"><label>Position / Role</label><input type="text" name="position" id="officer-position" placeholder="President, Secretary..." /></div>
-      <div class="form-group"><label>Photo URL</label><input type="url" name="photo_url" id="officer-photo" placeholder="https://..." /></div>
-      <div class="form-group"><label>Or Upload Photo</label><input type="file" name="officer_photo_file" accept="image/*" style="padding:0.3rem;" /></div>
-      <div class="flex justify-end gap-2">
-        <button type="button" onclick="closeModal('modal-officer')" class="btn-outline">Cancel</button>
-        <button type="submit" class="btn-gold">Save Officer</button>
+    <form method="POST" action="/admin/save/schedules">
+      <div class="grid gap-4">
+        <div><label class="form-label">Title</label><input name="title" class="inp" required/></div>
+        <div><label class="form-label">Day &amp; Time</label><input name="day_time" class="inp" placeholder="Every Sunday, 8:00 AM" required/></div>
+        <div><label class="form-label">Location</label><input name="location" class="inp" placeholder="School Chapel"/></div>
+        <div><label class="form-label">Description</label><textarea name="description" class="inp"></textarea></div>
+        <div><label class="form-label">Order Index</label><input name="order_index" type="number" class="inp" value="0"/></div>
+      </div>
+      <div class="mt-4 flex gap-3 justify-end">
+        <button type="button" onclick="closeModal('modal-schedule-new')" class="btn-outline">Cancel</button>
+        <button type="submit" class="btn-gold px-6 py-2">Add Schedule</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- ========== SCRIPTS ========== -->
+<!-- Schedule EDIT -->
+<div id="modal-schedule-edit" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('modal-schedule-edit')">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="cinzel font-bold text-base" style="color:var(--gold);">Edit Schedule</h3>
+      <button onclick="closeModal('modal-schedule-edit')" style="color:var(--text-secondary);"><i data-lucide="x" width="18" height="18"></i></button>
+    </div>
+    <form method="POST" action="/admin/save/schedules">
+      <input type="hidden" name="id" id="edit-sched-id"/>
+      <div class="grid gap-4">
+        <div><label class="form-label">Title</label><input name="title" id="edit-sched-title" class="inp" required/></div>
+        <div><label class="form-label">Day &amp; Time</label><input name="day_time" id="edit-sched-daytime" class="inp" required/></div>
+        <div><label class="form-label">Location</label><input name="location" id="edit-sched-loc" class="inp"/></div>
+        <div><label class="form-label">Description</label><textarea name="description" id="edit-sched-desc" class="inp"></textarea></div>
+        <div><label class="form-label">Order Index</label><input name="order_index" id="edit-sched-order" type="number" class="inp"/></div>
+      </div>
+      <div class="mt-4 flex gap-3 justify-end">
+        <button type="button" onclick="closeModal('modal-schedule-edit')" class="btn-outline">Cancel</button>
+        <button type="submit" class="btn-gold px-6 py-2">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Gallery NEW -->
+<div id="modal-gallery-new" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('modal-gallery-new')">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="cinzel font-bold text-base" style="color:var(--gold);">Add Gallery Photo</h3>
+      <button onclick="closeModal('modal-gallery-new')" style="color:var(--text-secondary);"><i data-lucide="x" width="18" height="18"></i></button>
+    </div>
+    <form method="POST" action="/admin/save/gallery" enctype="multipart/form-data">
+      <div class="grid gap-4">
+        <div><label class="form-label">Title</label><input name="title" class="inp" required/></div>
+        <div><label class="form-label">Caption</label><textarea name="caption" class="inp"></textarea></div>
+        <div><label class="form-label">Image URL</label><input name="image_url" class="inp" placeholder="https://…"/></div>
+        <div><label class="form-label">Image File (overrides URL)</label><input name="image_file" type="file" accept="image/*" class="inp" style="padding:6px;"/></div>
+        <div><label class="form-label">Order Index</label><input name="order_index" type="number" class="inp" value="0"/></div>
+      </div>
+      <div class="mt-4 flex gap-3 justify-end">
+        <button type="button" onclick="closeModal('modal-gallery-new')" class="btn-outline">Cancel</button>
+        <button type="submit" class="btn-gold px-6 py-2">Add Photo</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Gallery EDIT -->
+<div id="modal-gallery-edit" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('modal-gallery-edit')">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="cinzel font-bold text-base" style="color:var(--gold);">Edit Gallery Photo</h3>
+      <button onclick="closeModal('modal-gallery-edit')" style="color:var(--text-secondary);"><i data-lucide="x" width="18" height="18"></i></button>
+    </div>
+    <form method="POST" action="/admin/save/gallery" enctype="multipart/form-data">
+      <input type="hidden" name="id" id="edit-gal-id"/>
+      <div class="grid gap-4">
+        <div><label class="form-label">Title</label><input name="title" id="edit-gal-title" class="inp" required/></div>
+        <div><label class="form-label">Caption</label><textarea name="caption" id="edit-gal-caption" class="inp"></textarea></div>
+        <div><label class="form-label">Image URL</label><input name="image_url" id="edit-gal-img" class="inp"/></div>
+        <div><label class="form-label">Replace Image File</label><input name="image_file" type="file" accept="image/*" class="inp" style="padding:6px;"/></div>
+        <div><label class="form-label">Order Index</label><input name="order_index" id="edit-gal-order" type="number" class="inp"/></div>
+      </div>
+      <div class="mt-4 flex gap-3 justify-end">
+        <button type="button" onclick="closeModal('modal-gallery-edit')" class="btn-outline">Cancel</button>
+        <button type="submit" class="btn-gold px-6 py-2">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Officer NEW -->
+<div id="modal-officer-new" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('modal-officer-new')">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="cinzel font-bold text-base" style="color:var(--gold);">Add Officer</h3>
+      <button onclick="closeModal('modal-officer-new')" style="color:var(--text-secondary);"><i data-lucide="x" width="18" height="18"></i></button>
+    </div>
+    <form method="POST" action="/admin/save/officers" enctype="multipart/form-data">
+      <div class="grid gap-4">
+        <div><label class="form-label">Full Name</label><input name="name" class="inp" required/></div>
+        <div><label class="form-label">Position / Role</label><input name="position" class="inp" required/></div>
+        <div><label class="form-label">Bio</label><textarea name="bio" class="inp"></textarea></div>
+        <div><label class="form-label">Photo URL</label><input name="image_url" class="inp" placeholder="https://…"/></div>
+        <div><label class="form-label">Photo File (overrides URL)</label><input name="image_file" type="file" accept="image/*" class="inp" style="padding:6px;"/></div>
+        <div><label class="form-label">Order Index</label><input name="order_index" type="number" class="inp" value="0"/></div>
+      </div>
+      <div class="mt-4 flex gap-3 justify-end">
+        <button type="button" onclick="closeModal('modal-officer-new')" class="btn-outline">Cancel</button>
+        <button type="submit" class="btn-gold px-6 py-2">Add Officer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Officer EDIT -->
+<div id="modal-officer-edit" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('modal-officer-edit')">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="cinzel font-bold text-base" style="color:var(--gold);">Edit Officer</h3>
+      <button onclick="closeModal('modal-officer-edit')" style="color:var(--text-secondary);"><i data-lucide="x" width="18" height="18"></i></button>
+    </div>
+    <form method="POST" action="/admin/save/officers" enctype="multipart/form-data">
+      <input type="hidden" name="id" id="edit-off-id"/>
+      <div class="grid gap-4">
+        <div><label class="form-label">Full Name</label><input name="name" id="edit-off-name" class="inp" required/></div>
+        <div><label class="form-label">Position / Role</label><input name="position" id="edit-off-pos" class="inp" required/></div>
+        <div><label class="form-label">Bio</label><textarea name="bio" id="edit-off-bio" class="inp"></textarea></div>
+        <div><label class="form-label">Photo URL</label><input name="image_url" id="edit-off-img" class="inp"/></div>
+        <div><label class="form-label">Replace Photo File</label><input name="image_file" type="file" accept="image/*" class="inp" style="padding:6px;"/></div>
+        <div><label class="form-label">Order Index</label><input name="order_index" id="edit-off-order" type="number" class="inp"/></div>
+      </div>
+      <div class="mt-4 flex gap-3 justify-end">
+        <button type="button" onclick="closeModal('modal-officer-edit')" class="btn-outline">Cancel</button>
+        <button type="submit" class="btn-gold px-6 py-2">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
-  const AD = APP_DATA;
+// ─── Sidebar ─────────────────────────────────────────────
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  const open = sb.classList.toggle('open');
+  ov.style.display = open ? 'block' : 'none';
+}
 
-  // --- SECTION NAV ---
-  const sectionTitles = {
-    general: 'General & Hero', liturgical: 'Liturgical Season', cards: 'Info Cards',
-    ministries: 'Ministries', schedules: 'Schedules', gallery: 'Gallery',
-    officers: 'Officers', applications: 'Applications'
-  };
-
-  function showSection(id) {
-    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-    document.getElementById('section-' + id).classList.add('active');
-    const nav = document.getElementById('nav-' + id);
-    if (nav) nav.classList.add('active');
-    document.getElementById('page-title').textContent = sectionTitles[id] || id;
-    lucide.createIcons();
-  }
-
-  // Count pending applications
-  (function() {
-    const apps = AD.applications || [];
-    const pending = apps.filter(a => (a.status || 'Pending') === 'Pending').length;
-    if (pending > 0) {
-      const badge = document.getElementById('app-badge');
-      badge.textContent = pending; badge.classList.remove('hidden');
-    }
-  })();
-
-  // --- MODALS ---
-  function openModal(id) { document.getElementById(id).classList.add('open'); lucide.createIcons(); }
-  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-  document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('open');
-  }));
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
-  });
-
-  // --- TOGGLES ---
-  function toggleMusic(el) {
-    el.classList.toggle('on');
-    document.getElementById('music-enabled-input').value = el.classList.contains('on') ? '1' : '0';
-  }
-  function toggleLiturgical(el) {
-    el.classList.toggle('on');
-    const isOn = el.classList.contains('on');
-    document.getElementById('lit-override-input').value = isOn ? '1' : '0';
-    const fields = document.getElementById('lit-manual-fields');
-    fields.classList.toggle('opacity-40', !isOn);
-    fields.classList.toggle('pointer-events-none', !isOn);
-  }
-
-  // --- VESTMENT COLOR ---
-  function pickVestmentColor(col) {
-    document.getElementById('lit-color-input').value = col;
-    document.querySelectorAll('.color-swatch').forEach(s => s.classList.toggle('selected', s.style.background === col));
-  }
-
-  // --- EDIT HELPERS ---
-  function editCard(idx) {
-    const c = AD.cards[idx];
-    document.getElementById('card-id-input').value = c.id || '';
-    document.getElementById('card-icon').value = c.icon || '';
-    document.getElementById('card-title').value = c.title || '';
-    document.getElementById('card-body').value = c.body || '';
-    document.getElementById('modal-card-title').textContent = 'Edit Info Card';
-    openModal('modal-card');
-  }
-  function editMinistry(idx) {
-    const m = AD.ministries[idx];
-    document.getElementById('ministry-id-input').value = m.id || '';
-    document.getElementById('ministry-icon').value = m.icon || '';
-    document.getElementById('ministry-name').value = m.name || '';
-    document.getElementById('ministry-desc').value = m.description || '';
-    document.getElementById('ministry-schedule').value = m.schedule || '';
-    document.getElementById('ministry-reqs').value = m.requirements || '';
-    openModal('modal-ministry');
-  }
-  function editSchedule(idx) {
-    const s = AD.schedules[idx];
-    document.getElementById('schedule-id-input').value = s.id || '';
-    document.getElementById('sched-title').value = s.title || '';
-    document.getElementById('sched-type').value = s.type || 'event';
-    document.getElementById('sched-datetime').value = s.datetime || '';
-    document.getElementById('sched-location').value = s.location || '';
-    document.getElementById('sched-notes').value = s.notes || '';
-    openModal('modal-schedule');
-  }
-  function editOfficer(idx) {
-    const o = AD.officers[idx];
-    document.getElementById('officer-id-input').value = o.id || '';
-    document.getElementById('officer-name').value = o.name || '';
-    document.getElementById('officer-position').value = o.position || '';
-    document.getElementById('officer-photo').value = o.photo_url || '';
-    openModal('modal-officer');
-  }
-
+// ─── Section navigation ───────────────────────────────────
+const SECTION_LABELS = {
+  overview: 'Dashboard Overview',
+  settings: 'Hero, Branding & Music',
+  liturgical: 'Liturgical Season',
+  cards: 'Homepage Cards',
+  ministries: 'Ministries',
+  schedules: 'Schedules',
+  gallery: 'Gallery',
+  officers: 'About & Officers',
+  applications: 'Applications Inbox',
+};
+function showSection(id) {
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const sec = document.getElementById('sec-' + id);
+  if (sec) sec.classList.add('active');
+  const nav = document.getElementById('nav-' + id);
+  if (nav) nav.classList.add('active');
+  document.getElementById('topbar-title').textContent = SECTION_LABELS[id] || id;
+  window.scrollTo({top: 0, behavior: 'smooth'});
   lucide.createIcons();
+  // close sidebar on mobile
+  if (window.innerWidth < 768) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').style.display = 'none';
+  }
+}
+
+// ─── Auto-navigate to anchor on page load ────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = window.location.hash.replace('#','');
+  if (hash && SECTION_LABELS[hash]) showSection(hash);
+  lucide.createIcons();
+});
+
+// ─── Modals ───────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).style.display = 'flex';
+  lucide.createIcons();
+}
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+});
+
+// ─── Edit pre-fill helpers ────────────────────────────────
+function openEditCard(id, title, body, icon, order) {
+  document.getElementById('edit-card-id').value = id;
+  document.getElementById('edit-card-title').value = title;
+  document.getElementById('edit-card-body').value = body;
+  document.getElementById('edit-card-icon').value = icon;
+  document.getElementById('edit-card-order').value = order;
+  openModal('modal-card-edit');
+}
+function openEditMinistry(id, name, desc, img, order) {
+  document.getElementById('edit-ministry-id').value = id;
+  document.getElementById('edit-ministry-name').value = name;
+  document.getElementById('edit-ministry-desc').value = desc;
+  document.getElementById('edit-ministry-img').value = img;
+  document.getElementById('edit-ministry-order').value = order;
+  openModal('modal-ministry-edit');
+}
+function openEditSchedule(id, title, daytime, loc, desc, order) {
+  document.getElementById('edit-sched-id').value = id;
+  document.getElementById('edit-sched-title').value = title;
+  document.getElementById('edit-sched-daytime').value = daytime;
+  document.getElementById('edit-sched-loc').value = loc;
+  document.getElementById('edit-sched-desc').value = desc;
+  document.getElementById('edit-sched-order').value = order;
+  openModal('modal-schedule-edit');
+}
+function openEditGallery(id, title, caption, img, order) {
+  document.getElementById('edit-gal-id').value = id;
+  document.getElementById('edit-gal-title').value = title;
+  document.getElementById('edit-gal-caption').value = caption;
+  document.getElementById('edit-gal-img').value = img;
+  document.getElementById('edit-gal-order').value = order;
+  openModal('modal-gallery-edit');
+}
+function openEditOfficer(id, name, pos, bio, img, order) {
+  document.getElementById('edit-off-id').value = id;
+  document.getElementById('edit-off-name').value = name;
+  document.getElementById('edit-off-pos').value = pos;
+  document.getElementById('edit-off-bio').value = bio;
+  document.getElementById('edit-off-img').value = img;
+  document.getElementById('edit-off-order').value = order;
+  openModal('modal-officer-edit');
+}
+
+// ─── Auto-scroll to hash section on flash ────────────────
+(function() {
+  {% with messages = get_flashed_messages() %}{% endwith %}
+  const hash = window.location.hash.replace('#','');
+  if (hash && SECTION_LABELS[hash]) {
+    setTimeout(() => showSection(hash), 100);
+  }
+})();
 </script>
 
 {% endif %}
