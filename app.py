@@ -1,16 +1,23 @@
 import os
 import json
 import math
+import random
+import smtplib
 import threading
 import time
 import urllib.request
 from datetime import date, datetime
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from functools import wraps
 
+import requests
 from flask import (
     Flask, render_template, request, redirect,
     url_for, session, jsonify, flash
 )
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from werkzeug.utils import secure_filename
 
 # ---------------------------------------------------------------------------
@@ -26,6 +33,7 @@ if raw_db_url.startswith("postgres://"):
 
 app.config["SQLALCHEMY_DATABASE_URI"] = raw_db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True}
 
 db = SQLAlchemy(app)
 
@@ -60,6 +68,160 @@ def upload_file(file_storage):
         return f"/static/uploads/{filename}"
 
 # ---------------------------------------------------------------------------
+# Catholic Bible Verses (25, including Deuterocanonical)
+# ---------------------------------------------------------------------------
+
+CATHOLIC_BIBLE_VERSES = [
+    {"verse": "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.", "reference": "Joshua 1:9"},
+    {"verse": "I can do all things through Christ who strengthens me.", "reference": "Philippians 4:13"},
+    {"verse": "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", "reference": "Jeremiah 29:11"},
+    {"verse": "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.", "reference": "Proverbs 3:5-6"},
+    {"verse": "The Lord is my shepherd; I shall not want.", "reference": "Psalm 23:1"},
+    {"verse": "Even though I walk through the darkest valley, I will fear no evil, for you are with me; your rod and your staff, they comfort me.", "reference": "Psalm 23:4"},
+    {"verse": "But those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint.", "reference": "Isaiah 40:31"},
+    {"verse": "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.", "reference": "John 3:16"},
+    {"verse": "Love is patient, love is kind. It does not envy, it does not boast, it is not proud.", "reference": "1 Corinthians 13:4"},
+    {"verse": "And now these three remain: faith, hope and love. But the greatest of these is love.", "reference": "1 Corinthians 13:13"},
+    {"verse": "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.", "reference": "Philippians 4:6"},
+    {"verse": "Come to me, all you who are weary and burdened, and I will give you rest.", "reference": "Matthew 11:28"},
+    {"verse": "I am the way and the truth and the life. No one comes to the Father except through me.", "reference": "John 14:6"},
+    {"verse": "My child, when you come to serve the Lord, prepare yourself for trials.", "reference": "Sirach 2:1"},
+    {"verse": "The souls of the just are in the hand of God, and no torment shall touch them.", "reference": "Wisdom 3:1"},
+    {"verse": "Prayer with fasting is good, but better than both is almsgiving with righteousness.", "reference": "Tobit 12:8"},
+    {"verse": "With all your heart honor your father; your mother's birth pangs do not forget.", "reference": "Sirach 7:27"},
+    {"verse": "Happy are those who fear the Lord and walk in his ways.", "reference": "Psalm 128:1"},
+    {"verse": "The Lord is near to the brokenhearted and saves the crushed in spirit.", "reference": "Psalm 34:18"},
+    {"verse": "She is more precious than jewels, and nothing you desire can compare with her.", "reference": "Proverbs 3:15"},
+    {"verse": "Ask and it will be given to you; seek and you will find; knock and the door will be opened to you.", "reference": "Matthew 7:7"},
+    {"verse": "Be still, and know that I am God.", "reference": "Psalm 46:10"},
+    {"verse": "The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you.", "reference": "Numbers 6:24-25"},
+    {"verse": "Whatever you do, work at it with all your heart, as working for the Lord, not for human masters.", "reference": "Colossians 3:23"},
+    {"verse": "May the God of hope fill you with all joy and peace as you trust in him.", "reference": "Romans 15:13"},
+]
+
+# ---------------------------------------------------------------------------
+# Email helpers
+# ---------------------------------------------------------------------------
+
+BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "")
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "noreply@liturgicalclub.com")
+SMTP_HOST = os.environ.get("SMTP_HOST", "")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+SMTP_USER = os.environ.get("SMTP_USER", "")
+SMTP_PASS = os.environ.get("SMTP_PASS", "")
+
+
+def _build_welcome_email_html(full_name: str, verse: dict) -> str:
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Welcome to the Liturgical Club</title>
+<style>
+  body{{margin:0;padding:0;background:#0a1628;font-family:'Georgia',serif;}}
+  .container{{max-width:600px;margin:0 auto;background:#0d1f3c;border:2px solid #c9a84c;border-radius:12px;overflow:hidden;}}
+  .header{{background:linear-gradient(135deg,#0a1628 0%,#1a3a6e 50%,#0a1628 100%);padding:40px 30px;text-align:center;border-bottom:3px solid #c9a84c;}}
+  .cross{{font-size:48px;color:#c9a84c;display:block;margin-bottom:12px;}}
+  .header h1{{color:#c9a84c;font-size:26px;margin:0 0 8px;letter-spacing:2px;text-transform:uppercase;}}
+  .header p{{color:#a8c4e0;font-size:14px;margin:0;letter-spacing:1px;}}
+  .body{{padding:36px 30px;}}
+  .greeting{{color:#e8d5a3;font-size:18px;margin-bottom:20px;}}
+  .message{{color:#b8cfe8;font-size:15px;line-height:1.8;margin-bottom:28px;}}
+  .verse-box{{background:linear-gradient(135deg,#1a3a6e,#0d2a52);border-left:4px solid #c9a84c;border-radius:8px;padding:24px;margin:28px 0;}}
+  .verse-label{{color:#c9a84c;font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;}}
+  .verse-text{{color:#f0e6c8;font-size:16px;font-style:italic;line-height:1.7;margin-bottom:12px;}}
+  .verse-ref{{color:#c9a84c;font-size:13px;font-weight:bold;text-align:right;}}
+  .cta{{text-align:center;margin:30px 0;}}
+  .cta a{{background:linear-gradient(135deg,#c9a84c,#e8c96a);color:#0a1628;padding:14px 32px;border-radius:30px;text-decoration:none;font-size:15px;font-weight:bold;letter-spacing:1px;display:inline-block;}}
+  .footer{{background:#060f1e;padding:24px 30px;text-align:center;border-top:1px solid #1a3a6e;}}
+  .footer p{{color:#4a6fa5;font-size:12px;margin:4px 0;}}
+  .footer strong{{color:#c9a84c;}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <span class="cross">✝</span>
+    <h1>Liturgical Club</h1>
+    <p>Ora et Labora · Serving with Joy and Faith</p>
+  </div>
+  <div class="body">
+    <p class="greeting">Dear {full_name},</p>
+    <p class="message">
+      We are overjoyed to receive your application to join the <strong style="color:#c9a84c;">Liturgical Club</strong>!
+      Your desire to serve God through the sacred liturgy fills us with great hope.
+      Our team will review your application and reach out to you shortly.
+    </p>
+    <p class="message">
+      As you await our reply, we invite you to reflect on this sacred verse chosen especially for you:
+    </p>
+    <div class="verse-box">
+      <div class="verse-label">✦ Your Verse for Today ✦</div>
+      <div class="verse-text">"{verse['verse']}"</div>
+      <div class="verse-ref">— {verse['reference']}</div>
+    </div>
+    <p class="message">
+      May this Word accompany you as you begin this new chapter of service.
+      We are grateful for your openness and look forward to journeying with you.
+    </p>
+    <div class="cta">
+      <a href="#">Learn More About Our Ministries</a>
+    </div>
+  </div>
+  <div class="footer">
+    <p><strong>Liturgical Club</strong></p>
+    <p>Serving God Through Sacred Liturgy</p>
+    <p style="margin-top:12px;color:#2a4a7f;">This is an automated message. Please do not reply to this email.</p>
+  </div>
+</div>
+</body>
+</html>"""
+
+
+def _send_welcome_email(full_name: str, to_email: str, verse: dict):
+    subject = f"Welcome to the Liturgical Club, {full_name}! ✝"
+    html_body = _build_welcome_email_html(full_name, verse)
+
+    # Try Brevo first
+    if BREVO_API_KEY and SENDER_EMAIL:
+        try:
+            resp = requests.post(
+                "https://api.brevo.com/v3/smtp/email",
+                headers={
+                    "accept": "application/json",
+                    "api-key": BREVO_API_KEY,
+                    "content-type": "application/json",
+                },
+                json={
+                    "sender": {"name": "Liturgical Club", "email": SENDER_EMAIL},
+                    "to": [{"email": to_email, "name": full_name}],
+                    "subject": subject,
+                    "htmlContent": html_body,
+                },
+                timeout=15,
+            )
+            if resp.status_code in (200, 201):
+                return
+        except Exception:
+            pass
+
+    # Fallback: SMTP
+    if SMTP_HOST and SMTP_USER and SMTP_PASS:
+        try:
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = subject
+            msg["From"] = SENDER_EMAIL or SMTP_USER
+            msg["To"] = to_email
+            msg.attach(MIMEText(html_body, "html", "utf-8"))
+            with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as srv:
+                srv.ehlo()
+                srv.starttls()
+                srv.login(SMTP_USER, SMTP_PASS)
+                srv.sendmail(msg["From"], [to_email], msg.as_string())
+        except Exception:
+            pass
+
+
+# ---------------------------------------------------------------------------
 # Models
 # ---------------------------------------------------------------------------
 
@@ -72,10 +234,15 @@ class SiteSettings(db.Model):
     hero_image_url = db.Column(db.String(1000), default="")
     about_text = db.Column(db.Text, default="")
     footer_rainbow_text = db.Column(db.String(500), default="Liturgical Club · Serving with Joy")
-    background_music_url = db.Column(db.String(1000), default="")
     contact_email = db.Column(db.String(200), default="")
     contact_phone = db.Column(db.String(100), default="")
     facebook_url = db.Column(db.String(500), default="")
+    # Background music
+    music_enabled = db.Column(db.Boolean, default=True)
+    music_title = db.Column(db.String(300), default="Sacred Cathedral Instrumental")
+    music_url = db.Column(db.String(1000), default="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3")
+    # Legacy column kept for backward compat
+    background_music_url = db.Column(db.String(1000), default="")
     # Liturgical override
     liturgical_override_enabled = db.Column(db.Boolean, default=False)
     liturgical_override_text = db.Column(db.String(300), default="")
@@ -124,14 +291,17 @@ class Officer(db.Model):
     order_index = db.Column(db.Integer, default=0)
 
 
-class MemberApplication(db.Model):
+class Application(db.Model):
+    __tablename__ = "application"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
+    full_name = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(300), nullable=False)
     age = db.Column(db.Integer)
-    contact = db.Column(db.String(200))
-    ministry = db.Column(db.String(200))
-    experience = db.Column(db.Text)
-    note = db.Column(db.Text)
+    contact = db.Column(db.String(200), default="")
+    ministry = db.Column(db.String(200), default="")
+    experience = db.Column(db.Text, default="")
+    note = db.Column(db.Text, default="")
+    verse_sent = db.Column(db.Text, default="")
     status = db.Column(db.String(50), default="Pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -140,7 +310,6 @@ class MemberApplication(db.Model):
 # ---------------------------------------------------------------------------
 
 def _easter(year: int) -> date:
-    """Gregorian Computus Easter algorithm."""
     a = year % 19
     b = year // 100
     c = year % 100
@@ -158,9 +327,10 @@ def _easter(year: int) -> date:
     return date(year, month, day)
 
 
-def _date_add(d: date, days: int) -> date:
-    from datetime import timedelta
-    return d + __import__("datetime").timedelta(days=days)
+def _ordinal(n: int) -> str:
+    if 11 <= n % 100 <= 13:
+        return f"{n}th"
+    return {1: f"{n}st", 2: f"{n}nd", 3: f"{n}rd"}.get(n % 10, f"{n}th")
 
 
 def get_liturgical_info(today: date = None) -> dict:
@@ -168,13 +338,10 @@ def get_liturgical_info(today: date = None) -> dict:
         today = date.today()
     year = today.year
 
-    easter = _easter(year)
-    easter_prev = _easter(year - 1)
-    easter_next = _easter(year + 1)
-
     from datetime import timedelta
 
-    # Key dates current year
+    easter = _easter(year)
+
     ash_wednesday = easter - timedelta(days=46)
     palm_sunday = easter - timedelta(days=7)
     holy_thursday = easter - timedelta(days=3)
@@ -185,53 +352,33 @@ def get_liturgical_info(today: date = None) -> dict:
     trinity_sunday = pentecost + timedelta(days=7)
     corpus_christi = trinity_sunday + timedelta(days=4)
 
-    # Advent: 4 Sundays before Christmas
     christmas = date(year, 12, 25)
-    advent_start_offset = (christmas.weekday() + 1) % 7  # days after last Sunday before Christmas
+    advent_start_offset = (christmas.weekday() + 1) % 7
     last_sunday_before_xmas = christmas - timedelta(days=advent_start_offset if advent_start_offset else 7)
     advent_start = last_sunday_before_xmas - timedelta(weeks=3)
 
-    # Previous year advent (for year boundary)
     christmas_prev = date(year - 1, 12, 25)
     offset_prev = (christmas_prev.weekday() + 1) % 7
     last_sun_prev = christmas_prev - timedelta(days=offset_prev if offset_prev else 7)
     advent_start_prev = last_sun_prev - timedelta(weeks=3)
 
-    # Epiphany season (Jan 6 or nearest Sunday)
     epiphany = date(year, 1, 6)
-    # Baptism of the Lord: Sunday after Epiphany
     days_after = (6 - epiphany.weekday()) % 7
     baptism_lord = epiphany + timedelta(days=days_after if days_after else 7)
 
-    def week_num(start: date, today: date) -> int:
-        return max(1, math.ceil((today - start).days / 7) + 1)
+    def week_num(start: date, t: date) -> int:
+        return max(1, math.ceil((t - start).days / 7) + 1)
 
-    # Determine season
     if advent_start <= today < date(year, 12, 25):
         week = week_num(advent_start, today)
         ordinal = ["1st", "2nd", "3rd", "4th"][min(week - 1, 3)]
-        return {
-            "season": "Advent",
-            "week_label": f"{ordinal} Week of Advent",
-            "color": "purple",
-            "color_hex": "#6B2D8B"
-        }
+        return {"season": "Advent", "week_label": f"{ordinal} Week of Advent", "color": "purple", "color_hex": "#6B2D8B"}
 
     if today >= date(year, 12, 25) or today < epiphany:
-        return {
-            "season": "Christmas Season",
-            "week_label": "Christmas Season",
-            "color": "gold",
-            "color_hex": "#FFD700"
-        }
+        return {"season": "Christmas Season", "week_label": "Christmas Season", "color": "gold", "color_hex": "#FFD700"}
 
     if epiphany <= today <= baptism_lord:
-        return {
-            "season": "Christmas Season",
-            "week_label": "Epiphany & Christmas Season",
-            "color": "gold",
-            "color_hex": "#FFD700"
-        }
+        return {"season": "Christmas Season", "week_label": "Epiphany & Christmas Season", "color": "gold", "color_hex": "#FFD700"}
 
     if ash_wednesday <= today < easter:
         if today >= palm_sunday:
@@ -245,12 +392,7 @@ def get_liturgical_info(today: date = None) -> dict:
         week = week_num(ash_wednesday, today)
         ordinal_map = {1: "1st", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th"}
         ordinal = ordinal_map.get(week, f"{week}th")
-        return {
-            "season": "Lent",
-            "week_label": f"{ordinal} Week of Lent",
-            "color": "purple",
-            "color_hex": "#6B2D8B"
-        }
+        return {"season": "Lent", "week_label": f"{ordinal} Week of Lent", "color": "purple", "color_hex": "#6B2D8B"}
 
     if today == easter:
         return {"season": "Easter Season", "week_label": "Easter Sunday", "color": "gold", "color_hex": "#FFD700"}
@@ -263,36 +405,18 @@ def get_liturgical_info(today: date = None) -> dict:
             return {"season": "Easter Season", "week_label": "Ascension Thursday", "color": "gold", "color_hex": "#FFD700"}
         if today == pentecost:
             return {"season": "Easter Season", "week_label": "Pentecost Sunday", "color": "red", "color_hex": "#C0392B"}
-        return {
-            "season": "Easter Season",
-            "week_label": f"{ordinal} Week of Easter",
-            "color": "gold",
-            "color_hex": "#FFD700"
-        }
+        return {"season": "Easter Season", "week_label": f"{ordinal} Week of Easter", "color": "gold", "color_hex": "#FFD700"}
 
-    # Ordinary Time
-    # First OT period: Baptism of Lord + 1 day through Ash Wednesday
     if baptism_lord < today < ash_wednesday:
-        # Week 1 starts the Monday after Baptism
-        ot_start = baptism_lord + timedelta(days=1)
+        from datetime import timedelta as td
+        ot_start = baptism_lord + td(days=1)
         week = week_num(ot_start, today)
         ordinal = _ordinal(week)
-        return {
-            "season": "Ordinary Time",
-            "week_label": f"{ordinal} Week in Ordinary Time",
-            "color": "green",
-            "color_hex": "#2E7D32"
-        }
+        return {"season": "Ordinary Time", "week_label": f"{ordinal} Week in Ordinary Time", "color": "green", "color_hex": "#2E7D32"}
 
-    # Second OT period: day after Pentecost through start of Advent
     if pentecost < today < advent_start:
-        # Ordinary time weeks continue from where they left off before Lent
-        # Standard: week after Pentecost picks up at week 8 or computed properly
-        # Proper Ordo computation: count back from last Sunday of OT (Christ the King)
-        # Christ the King = Sunday before Advent
-        christ_king = advent_start - timedelta(days=7)
-        # Total OT weeks = 34; Christ the King = week 34
-        # Find week number by counting back
+        from datetime import timedelta as td
+        christ_king = advent_start - td(days=7)
         days_to_ck = (christ_king - today).days
         week_from_end = math.ceil(days_to_ck / 7)
         week = 34 - week_from_end
@@ -302,36 +426,49 @@ def get_liturgical_info(today: date = None) -> dict:
             return {"season": "Ordinary Time", "week_label": "Trinity Sunday", "color": "gold", "color_hex": "#FFD700"}
         if today == corpus_christi:
             return {"season": "Ordinary Time", "week_label": "Corpus Christi", "color": "gold", "color_hex": "#FFD700"}
-        return {
-            "season": "Ordinary Time",
-            "week_label": f"{ordinal} Week in Ordinary Time",
-            "color": "green",
-            "color_hex": "#2E7D32"
-        }
+        return {"season": "Ordinary Time", "week_label": f"{ordinal} Week in Ordinary Time", "color": "green", "color_hex": "#2E7D32"}
 
-    # Fallback: check previous year's Advent
     if advent_start_prev <= today < date(year, 1, 1):
         week = week_num(advent_start_prev, today)
         ordinal = ["1st", "2nd", "3rd", "4th"][min(week - 1, 3)]
-        return {
-            "season": "Advent",
-            "week_label": f"{ordinal} Week of Advent",
-            "color": "purple",
-            "color_hex": "#6B2D8B"
-        }
+        return {"season": "Advent", "week_label": f"{ordinal} Week of Advent", "color": "purple", "color_hex": "#6B2D8B"}
 
-    return {
-        "season": "Ordinary Time",
-        "week_label": "Ordinary Time",
-        "color": "green",
-        "color_hex": "#2E7D32"
-    }
+    return {"season": "Ordinary Time", "week_label": "Ordinary Time", "color": "green", "color_hex": "#2E7D32"}
 
+# ---------------------------------------------------------------------------
+# Migration: add new columns safely on startup
+# ---------------------------------------------------------------------------
 
-def _ordinal(n: int) -> str:
-    if 11 <= n % 100 <= 13:
-        return f"{n}th"
-    return {1: f"{n}st", 2: f"{n}nd", 3: f"{n}rd"}.get(n % 10, f"{n}th")
+def _safe_migrate():
+    """Add any missing columns to existing Neon tables without crashing."""
+    migrations = [
+        # SiteSettings new music columns
+        "ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS music_enabled BOOLEAN DEFAULT TRUE",
+        "ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS music_title VARCHAR(300) DEFAULT 'Sacred Cathedral Instrumental'",
+        "ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS music_url VARCHAR(1000) DEFAULT 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3'",
+        # Application table migration from old member_application schema
+        "ALTER TABLE application ADD COLUMN IF NOT EXISTS full_name VARCHAR(200)",
+        "ALTER TABLE application ADD COLUMN IF NOT EXISTS email VARCHAR(300)",
+        "ALTER TABLE application ADD COLUMN IF NOT EXISTS verse_sent TEXT",
+        "ALTER TABLE application ADD COLUMN IF NOT EXISTS age INTEGER",
+        "ALTER TABLE application ADD COLUMN IF NOT EXISTS contact VARCHAR(200)",
+        "ALTER TABLE application ADD COLUMN IF NOT EXISTS ministry VARCHAR(200)",
+        "ALTER TABLE application ADD COLUMN IF NOT EXISTS experience TEXT",
+        "ALTER TABLE application ADD COLUMN IF NOT EXISTS note TEXT",
+        "ALTER TABLE application ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'Pending'",
+        "ALTER TABLE application ADD COLUMN IF NOT EXISTS created_at TIMESTAMP",
+    ]
+    # Only run on PostgreSQL (Neon); SQLite uses IF NOT EXISTS differently
+    if "postgresql" in app.config["SQLALCHEMY_DATABASE_URI"]:
+        for stmt in migrations:
+            try:
+                db.session.execute(text(stmt))
+            except Exception:
+                db.session.rollback()
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
 
 # ---------------------------------------------------------------------------
 # Seed data
@@ -356,6 +493,9 @@ def seed_database():
         contact_email="liturgicalclub@example.com",
         contact_phone="+63 912 345 6789",
         facebook_url="https://facebook.com/liturgicalclub",
+        music_enabled=True,
+        music_title="Sacred Cathedral Instrumental",
+        music_url="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3",
     )
     db.session.add(settings)
 
@@ -407,7 +547,6 @@ def seed_database():
 
     db.session.commit()
 
-
 # ---------------------------------------------------------------------------
 # Keep-alive daemon
 # ---------------------------------------------------------------------------
@@ -423,51 +562,98 @@ def _keep_alive():
         except Exception:
             pass
 
-
 # ---------------------------------------------------------------------------
 # Data serialization helpers
 # ---------------------------------------------------------------------------
 
 def _settings_dict(s: SiteSettings) -> dict:
     return {
-        "id": s.id, "site_name": s.site_name, "tagline": s.tagline,
-        "hero_title": s.hero_title, "hero_subtitle": s.hero_subtitle,
-        "hero_image_url": s.hero_image_url, "about_text": s.about_text,
-        "footer_rainbow_text": s.footer_rainbow_text,
-        "background_music_url": s.background_music_url,
-        "contact_email": s.contact_email, "contact_phone": s.contact_phone,
-        "facebook_url": s.facebook_url,
-        "liturgical_override_enabled": s.liturgical_override_enabled,
-        "liturgical_override_text": s.liturgical_override_text,
-        "liturgical_override_color": s.liturgical_override_color,
+        "id": s.id,
+        "site_name": s.site_name or "",
+        "tagline": s.tagline or "",
+        "hero_title": s.hero_title or "",
+        "hero_subtitle": s.hero_subtitle or "",
+        "hero_image_url": s.hero_image_url or "",
+        "about_text": s.about_text or "",
+        "footer_rainbow_text": s.footer_rainbow_text or "",
+        "background_music_url": s.background_music_url or "",
+        "music_enabled": bool(s.music_enabled),
+        "music_title": s.music_title or "Sacred Cathedral Instrumental",
+        "music_url": s.music_url or "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3",
+        "contact_email": s.contact_email or "",
+        "contact_phone": s.contact_phone or "",
+        "facebook_url": s.facebook_url or "",
+        "liturgical_override_enabled": bool(s.liturgical_override_enabled),
+        "liturgical_override_text": s.liturgical_override_text or "",
+        "liturgical_override_color": s.liturgical_override_color or "green",
     }
 
 
 def _card_dict(c: HomepageInfoCard) -> dict:
-    return {"id": c.id, "title": c.title, "body": c.body, "icon": c.icon, "order_index": c.order_index}
+    return {
+        "id": c.id,
+        "title": c.title or "",
+        "body": c.body or "",
+        "icon": c.icon or "✝",
+        "order_index": c.order_index or 0,
+    }
 
 
 def _ministry_dict(m: Ministry) -> dict:
-    return {"id": m.id, "name": m.name, "description": m.description, "image_url": m.image_url, "order_index": m.order_index}
+    return {
+        "id": m.id,
+        "name": m.name or "",
+        "description": m.description or "",
+        "image_url": m.image_url or "",
+        "order_index": m.order_index or 0,
+    }
 
 
 def _schedule_dict(s: Schedule) -> dict:
-    return {"id": s.id, "title": s.title, "day_time": s.day_time, "location": s.location, "description": s.description, "order_index": s.order_index}
+    return {
+        "id": s.id,
+        "title": s.title or "",
+        "day_time": s.day_time or "",
+        "location": s.location or "",
+        "description": s.description or "",
+        "order_index": s.order_index or 0,
+    }
 
 
 def _gallery_dict(g: GalleryItem) -> dict:
-    return {"id": g.id, "title": g.title, "image_url": g.image_url, "caption": g.caption, "order_index": g.order_index}
+    return {
+        "id": g.id,
+        "title": g.title or "",
+        "image_url": g.image_url or "",
+        "caption": g.caption or "",
+        "order_index": g.order_index or 0,
+    }
 
 
 def _officer_dict(o: Officer) -> dict:
-    return {"id": o.id, "name": o.name, "position": o.position, "image_url": o.image_url, "bio": o.bio, "order_index": o.order_index}
-
-
-def _app_dict(a: MemberApplication) -> dict:
     return {
-        "id": a.id, "name": a.name, "age": a.age, "contact": a.contact,
-        "ministry": a.ministry, "experience": a.experience, "note": a.note,
-        "status": a.status, "created_at": a.created_at.isoformat() if a.created_at else ""
+        "id": o.id,
+        "name": o.name or "",
+        "position": o.position or "",
+        "image_url": o.image_url or "",
+        "bio": o.bio or "",
+        "order_index": o.order_index or 0,
+    }
+
+
+def _app_dict(a: Application) -> dict:
+    return {
+        "id": a.id,
+        "full_name": a.full_name or "",
+        "email": a.email or "",
+        "age": a.age,
+        "contact": a.contact or "",
+        "ministry": a.ministry or "",
+        "experience": a.experience or "",
+        "note": a.note or "",
+        "verse_sent": a.verse_sent or "",
+        "status": a.status or "Pending",
+        "created_at": a.created_at.isoformat() if a.created_at else "",
     }
 
 
@@ -482,7 +668,7 @@ def _get_liturgical_display(settings: SiteSettings) -> dict:
             "week_label": settings.liturgical_override_text,
             "color": settings.liturgical_override_color,
             "color_hex": color_map.get(settings.liturgical_override_color, "#2E7D32"),
-            "is_override": True
+            "is_override": True,
         }
     info = get_liturgical_info()
     info["is_override"] = False
@@ -528,17 +714,17 @@ def about():
 
 
 @app.route("/ministries")
-def ministries():
+def ministries_page():
     return render_template("index.html", **_get_all_data("ministries"))
 
 
 @app.route("/schedules")
-def schedules():
+def schedules_page():
     return render_template("index.html", **_get_all_data("schedules"))
 
 
 @app.route("/gallery")
-def gallery():
+def gallery_page():
     return render_template("index.html", **_get_all_data("gallery"))
 
 
@@ -549,26 +735,53 @@ def join():
 
 @app.route("/api/join", methods=["POST"])
 def api_join():
-    data = request.form if request.form else request.get_json(silent=True) or {}
-    app_entry = MemberApplication(
-        name=data.get("name", ""),
-        age=int(data.get("age", 0)) if data.get("age") else None,
+    data = request.get_json(silent=True) or request.form.to_dict()
+
+    full_name = (data.get("full_name") or data.get("name") or "").strip()
+    email = (data.get("email") or "").strip()
+
+    if not full_name:
+        return jsonify({"success": False, "error": "full_name is required"}), 400
+    if not email or "@" not in email:
+        return jsonify({"success": False, "error": "A valid email is required"}), 400
+
+    chosen = random.choice(CATHOLIC_BIBLE_VERSES)
+    verse_text = f'"{chosen["verse"]}" — {chosen["reference"]}'
+
+    try:
+        age_val = int(data.get("age", 0)) if data.get("age") else None
+    except (ValueError, TypeError):
+        age_val = None
+
+    app_entry = Application(
+        full_name=full_name,
+        email=email,
+        age=age_val,
         contact=data.get("contact", ""),
         ministry=data.get("ministry", ""),
         experience=data.get("experience", ""),
         note=data.get("note", ""),
-        status="Pending"
+        verse_sent=verse_text,
+        status="Pending",
     )
     db.session.add(app_entry)
     db.session.commit()
-    return jsonify({"success": True, "message": "Application submitted successfully!"}), 201
+
+    # Fire-and-forget email
+    t = threading.Thread(
+        target=_send_welcome_email,
+        args=(full_name, email, chosen),
+        daemon=True,
+    )
+    t.start()
+
+    return jsonify({"success": True, "verse": verse_text}), 201
 
 # ---------------------------------------------------------------------------
 # Admin auth
 # ---------------------------------------------------------------------------
 
 def admin_required(f):
-    from functools import wraps
     @wraps(f)
     def decorated(*args, **kwargs):
         if not session.get("admin_logged_in"):
@@ -603,18 +816,23 @@ def admin_dashboard():
     mins = Ministry.query.order_by(Ministry.order_index).all()
     scheds = Schedule.query.order_by(Schedule.order_index).all()
     gals = GalleryItem.query.order_by(GalleryItem.order_index).all()
-    officers = Officer.query.order_by(Officer.order_index).all()
-    apps = MemberApplication.query.order_by(MemberApplication.created_at.desc()).all()
+    offs = Officer.query.order_by(Officer.order_index).all()
+    apps = Application.query.order_by(Application.created_at.desc()).all()
     liturgical = get_liturgical_info()
     return render_template(
         "admin.html",
-        settings=settings, cards=cards, ministries=mins,
-        schedules=scheds, gallery=gals, officers=officers,
-        applications=apps, liturgical=liturgical
+        settings=settings,
+        cards=cards,
+        ministries=mins,
+        schedules=scheds,
+        gallery=gals,
+        officers=offs,
+        applications=apps,
+        liturgical=liturgical,
     )
 
 # ---------------------------------------------------------------------------
-# Admin CRUD — save
+# Admin CRUD — settings
 # ---------------------------------------------------------------------------
 
 @app.route("/admin/save/settings", methods=["POST"])
@@ -634,6 +852,17 @@ def admin_save_settings():
     s.liturgical_override_text = request.form.get("liturgical_override_text", s.liturgical_override_text)
     s.liturgical_override_color = request.form.get("liturgical_override_color", s.liturgical_override_color)
 
+    # Music settings
+    s.music_enabled = request.form.get("music_enabled") == "on"
+    s.music_title = request.form.get("music_title", s.music_title)
+    music_url_field = request.form.get("music_url", "").strip()
+    if music_url_field:
+        s.music_url = music_url_field
+    elif "music_file" in request.files and request.files["music_file"].filename:
+        url = upload_file(request.files["music_file"])
+        if url:
+            s.music_url = url
+
     # Hero image
     hero_img_url = request.form.get("hero_image_url", "").strip()
     if hero_img_url:
@@ -643,19 +872,16 @@ def admin_save_settings():
         if url:
             s.hero_image_url = url
 
-    # Background music
-    music_url = request.form.get("background_music_url", "").strip()
-    if music_url:
-        s.background_music_url = music_url
-    elif "music_file" in request.files and request.files["music_file"].filename:
-        url = upload_file(request.files["music_file"])
-        if url:
-            s.background_music_url = url
+    # Legacy background_music_url kept in sync
+    s.background_music_url = s.music_url
 
     db.session.commit()
     flash("Settings saved.", "success")
     return redirect(url_for("admin_dashboard") + "#settings")
 
+# ---------------------------------------------------------------------------
+# Admin CRUD — cards
+# ---------------------------------------------------------------------------
 
 @app.route("/admin/save/cards", methods=["POST"])
 @admin_required
@@ -663,6 +889,9 @@ def admin_save_cards():
     card_id = request.form.get("id")
     if card_id:
         c = HomepageInfoCard.query.get(int(card_id))
+        if not c:
+            flash("Card not found.", "error")
+            return redirect(url_for("admin_dashboard") + "#cards")
     else:
         c = HomepageInfoCard()
         db.session.add(c)
@@ -684,6 +913,9 @@ def admin_delete_card(item_id):
     flash("Card deleted.", "success")
     return redirect(url_for("admin_dashboard") + "#cards")
 
+# ---------------------------------------------------------------------------
+# Admin CRUD — ministries
+# ---------------------------------------------------------------------------
 
 @app.route("/admin/save/ministries", methods=["POST"])
 @admin_required
@@ -691,6 +923,9 @@ def admin_save_ministry():
     mid = request.form.get("id")
     if mid:
         m = Ministry.query.get(int(mid))
+        if not m:
+            flash("Ministry not found.", "error")
+            return redirect(url_for("admin_dashboard") + "#ministries")
     else:
         m = Ministry()
         db.session.add(m)
@@ -718,6 +953,9 @@ def admin_delete_ministry(item_id):
     flash("Ministry deleted.", "success")
     return redirect(url_for("admin_dashboard") + "#ministries")
 
+# ---------------------------------------------------------------------------
+# Admin CRUD — schedules
+# ---------------------------------------------------------------------------
 
 @app.route("/admin/save/schedules", methods=["POST"])
 @admin_required
@@ -725,6 +963,9 @@ def admin_save_schedule():
     sid = request.form.get("id")
     if sid:
         s = Schedule.query.get(int(sid))
+        if not s:
+            flash("Schedule not found.", "error")
+            return redirect(url_for("admin_dashboard") + "#schedules")
     else:
         s = Schedule()
         db.session.add(s)
@@ -747,6 +988,9 @@ def admin_delete_schedule(item_id):
     flash("Schedule deleted.", "success")
     return redirect(url_for("admin_dashboard") + "#schedules")
 
+# ---------------------------------------------------------------------------
+# Admin CRUD — gallery
+# ---------------------------------------------------------------------------
 
 @app.route("/admin/save/gallery", methods=["POST"])
 @admin_required
@@ -754,6 +998,9 @@ def admin_save_gallery():
     gid = request.form.get("id")
     if gid:
         g = GalleryItem.query.get(int(gid))
+        if not g:
+            flash("Gallery item not found.", "error")
+            return redirect(url_for("admin_dashboard") + "#gallery")
     else:
         g = GalleryItem()
         db.session.add(g)
@@ -781,6 +1028,9 @@ def admin_delete_gallery(item_id):
     flash("Gallery item deleted.", "success")
     return redirect(url_for("admin_dashboard") + "#gallery")
 
+# ---------------------------------------------------------------------------
+# Admin CRUD — officers
+# ---------------------------------------------------------------------------
 
 @app.route("/admin/save/officers", methods=["POST"])
 @admin_required
@@ -788,6 +1038,9 @@ def admin_save_officer():
     oid = request.form.get("id")
     if oid:
         o = Officer.query.get(int(oid))
+        if not o:
+            flash("Officer not found.", "error")
+            return redirect(url_for("admin_dashboard") + "#officers")
     else:
         o = Officer()
         db.session.add(o)
@@ -816,6 +1069,9 @@ def admin_delete_officer(item_id):
     flash("Officer deleted.", "success")
     return redirect(url_for("admin_dashboard") + "#officers")
 
+# ---------------------------------------------------------------------------
+# Admin CRUD — applications
+# ---------------------------------------------------------------------------
 
 @app.route("/admin/save/applications", methods=["POST"])
 @admin_required
@@ -824,7 +1080,10 @@ def admin_save_application():
     if not aid:
         flash("No application ID.", "error")
         return redirect(url_for("admin_dashboard") + "#applications")
-    a = MemberApplication.query.get(int(aid))
+    a = Application.query.get(int(aid))
+    if not a:
+        flash("Application not found.", "error")
+        return redirect(url_for("admin_dashboard") + "#applications")
     a.status = request.form.get("status", a.status)
     db.session.commit()
     flash("Application updated.", "success")
@@ -834,7 +1093,7 @@ def admin_save_application():
 @app.route("/admin/delete/applications/<int:item_id>", methods=["POST"])
 @admin_required
 def admin_delete_application(item_id):
-    a = MemberApplication.query.get_or_404(item_id)
+    a = Application.query.get_or_404(item_id)
     db.session.delete(a)
     db.session.commit()
     flash("Application deleted.", "success")
@@ -846,10 +1105,11 @@ def admin_delete_application(item_id):
 
 with app.app_context():
     db.create_all()
+    _safe_migrate()
     seed_database()
 
-t = threading.Thread(target=_keep_alive, daemon=True)
-t.start()
+_keep_alive_thread = threading.Thread(target=_keep_alive, daemon=True)
+_keep_alive_thread.start()
 
 if __name__ == "__main__":
     app.run(debug=True)
