@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ app_data.settings.club_name | default('Liturgical Club') }}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <title id="page-title">Liturgical Club</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/umd/lucide.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -29,161 +29,154 @@
   <style>
     :root { --gold: #D4AF37; --navy: #091024; --card: #0F1A38; }
     * { font-family: 'Plus Jakarta Sans', sans-serif; }
-    h1, h2, h3, .font-cinzel { font-family: 'Cinzel', serif; }
+    h1,h2,h3,.font-cinzel { font-family: 'Cinzel', serif; }
 
-    [data-theme="dark"] body { background: #091024; color: #e8e0d0; }
-    [data-theme="light"] body { background: #f4f0e8; color: #1a1200; }
-    [data-theme="light"] .nav-bar { background: rgba(244,240,232,0.95); border-color: rgba(212,175,55,0.3); }
-    [data-theme="light"] .card-bg { background: #fff8e8; border-color: rgba(212,175,55,0.3); }
-    [data-theme="dark"] .nav-bar { background: rgba(9,16,36,0.95); border-color: rgba(212,175,55,0.15); }
-    [data-theme="dark"] .card-bg { background: #0F1A38; border-color: rgba(212,175,55,0.2); }
+    [data-theme="dark"] body  { background:#091024; color:#e8e0d0; }
+    [data-theme="light"] body { background:#f4f0e8; color:#1a1200; }
+    [data-theme="light"] .nav-bar  { background:rgba(244,240,232,0.95); border-color:rgba(212,175,55,0.3); }
+    [data-theme="light"] .card-bg  { background:#fff8e8; border-color:rgba(212,175,55,0.3); }
+    [data-theme="dark"]  .nav-bar  { background:rgba(9,16,36,0.95);  border-color:rgba(212,175,55,0.15); }
+    [data-theme="dark"]  .card-bg  { background:#0F1A38; border-color:rgba(212,175,55,0.2); }
 
-    .gold-border { border: 1px solid rgba(212,175,55,0.3); }
-    .gold-text { color: #D4AF37; }
-    .gold-glow { box-shadow: 0 0 20px rgba(212,175,55,0.15); }
+    .gold-border { border:1px solid rgba(212,175,55,0.3); }
+    .gold-text   { color:#D4AF37; }
+    .gold-glow   { box-shadow:0 0 20px rgba(212,175,55,0.15); }
 
     .rainbow-text {
-      background: linear-gradient(90deg,#ff0000,#ff7700,#ffdd00,#00dd00,#0099ff,#aa00ff,#ff0099,#ff0000);
-      background-size: 200% auto;
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: rainbow-move 4s linear infinite;
+      background:linear-gradient(90deg,#ff0000,#ff7700,#ffdd00,#00dd00,#0099ff,#aa00ff,#ff0099,#ff0000);
+      background-size:200% auto;
+      -webkit-background-clip:text; background-clip:text;
+      -webkit-text-fill-color:transparent;
+      animation:rainbow-move 4s linear infinite;
     }
-    @keyframes rainbow-move { to { background-position: 200% center; } }
+    @keyframes rainbow-move { to { background-position:200% center; } }
 
-    .nav-link { position: relative; padding-bottom: 2px; transition: color 0.2s; }
-    .nav-link.active::after, .nav-link:hover::after {
-      content: ''; position: absolute; bottom: -2px; left: 0; right: 0;
-      height: 2px; background: #D4AF37; border-radius: 1px;
+    .nav-link { position:relative; padding-bottom:2px; transition:color 0.2s; }
+    .nav-link.active::after,.nav-link:hover::after {
+      content:''; position:absolute; bottom:-2px; left:0; right:0;
+      height:2px; background:#D4AF37; border-radius:1px;
     }
-    .nav-link.active { color: #D4AF37; }
+    .nav-link.active { color:#D4AF37; }
 
-    .view { display: none; animation: fadeIn 0.3s ease; }
-    .view.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .view { display:none; animation:fadeIn 0.3s ease; }
+    .view.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
 
-    .glass { background: rgba(15,26,56,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-    [data-theme="light"] .glass { background: rgba(255,248,232,0.85); }
+    .glass { background:rgba(15,26,56,0.7); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+    [data-theme="light"] .glass { background:rgba(255,248,232,0.85); }
 
-    .hero-gradient { background: linear-gradient(135deg, rgba(9,16,36,0.97) 0%, rgba(15,26,56,0.9) 50%, rgba(9,16,36,0.97) 100%); }
-    [data-theme="light"] .hero-gradient { background: linear-gradient(135deg, rgba(244,240,232,0.95) 0%, rgba(255,248,232,0.9) 100%); }
+    .hero-gradient { background:linear-gradient(135deg,rgba(9,16,36,0.97) 0%,rgba(15,26,56,0.9) 50%,rgba(9,16,36,0.97) 100%); }
+    [data-theme="light"] .hero-gradient { background:linear-gradient(135deg,rgba(244,240,232,0.95) 0%,rgba(255,248,232,0.9) 100%); }
 
-    .vestment-dot { width: 10px; height: 10px; border-radius: 50%; animation: glow-pulse 2s ease-in-out infinite; }
-    @keyframes glow-pulse { 0%,100% { box-shadow: 0 0 4px 1px currentColor; } 50% { box-shadow: 0 0 10px 3px currentColor; } }
+    .vestment-dot { width:10px; height:10px; border-radius:50%; animation:glow-pulse 2s ease-in-out infinite; }
+    @keyframes glow-pulse { 0%,100%{box-shadow:0 0 4px 1px currentColor;} 50%{box-shadow:0 0 10px 3px currentColor;} }
 
-    .lightbox-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: none; align-items: center; justify-content: center; }
-    .lightbox-overlay.open { display: flex; }
+    .lightbox-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:1000; display:none; align-items:center; justify-content:center; }
+    .lightbox-overlay.open { display:flex; }
 
-    .mini-player { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 50; }
-    .mini-player-inner { background: rgba(15,26,56,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(212,175,55,0.3); border-radius: 1rem; padding: 0.75rem 1rem; min-width: 220px; }
-    [data-theme="light"] .mini-player-inner { background: rgba(255,248,232,0.9); }
+    .mini-player { position:fixed; bottom:1.5rem; right:1.5rem; z-index:50; }
+    .mini-player-inner { background:rgba(15,26,56,0.85); backdrop-filter:blur(16px); border:1px solid rgba(212,175,55,0.3); border-radius:1rem; padding:0.75rem 1rem; min-width:220px; }
+    [data-theme="light"] .mini-player-inner { background:rgba(255,248,232,0.9); }
 
-    .schedule-card:hover, .ministry-card:hover { transform: translateY(-2px); transition: transform 0.2s; }
+    .schedule-card:hover,.ministry-card:hover { transform:translateY(-2px); transition:transform 0.2s; }
 
-    .status-bar { border-top: 1px solid rgba(212,175,55,0.15); border-bottom: 1px solid rgba(212,175,55,0.15); }
-    [data-theme="dark"] .status-bar { background: rgba(15,26,56,0.6); }
-    [data-theme="light"] .status-bar { background: rgba(255,248,232,0.8); }
+    .status-bar { border-top:1px solid rgba(212,175,55,0.15); border-bottom:1px solid rgba(212,175,55,0.15); }
+    [data-theme="dark"] .status-bar { background:rgba(15,26,56,0.6); }
+    [data-theme="light"] .status-bar { background:rgba(255,248,232,0.8); }
 
-    input, textarea, select {
-      background: rgba(9,16,36,0.6); border: 1px solid rgba(212,175,55,0.25);
-      color: inherit; border-radius: 0.5rem; padding: 0.6rem 0.9rem; width: 100%;
-      outline: none; transition: border-color 0.2s;
+    input,textarea,select {
+      background:rgba(9,16,36,0.6); border:1px solid rgba(212,175,55,0.25);
+      color:inherit; border-radius:0.5rem; padding:0.6rem 0.9rem; width:100%;
+      outline:none; transition:border-color 0.2s;
     }
-    [data-theme="light"] input, [data-theme="light"] textarea, [data-theme="light"] select {
-      background: rgba(255,248,232,0.8); color: #1a1200;
+    [data-theme="light"] input,[data-theme="light"] textarea,[data-theme="light"] select {
+      background:rgba(255,248,232,0.8); color:#1a1200;
     }
-    input:focus, textarea:focus, select:focus { border-color: #D4AF37; }
+    input:focus,textarea:focus,select:focus { border-color:#D4AF37; }
 
-    .btn-gold { background: #D4AF37; color: #091024; font-weight: 700; padding: 0.65rem 1.5rem; border-radius: 0.5rem; transition: all 0.2s; cursor: pointer; font-family: 'Cinzel', serif; letter-spacing: 0.05em; }
-    .btn-gold:hover { background: #E8CC6A; box-shadow: 0 0 20px rgba(212,175,55,0.4); }
-    .btn-outline { border: 1px solid rgba(212,175,55,0.5); color: #D4AF37; padding: 0.65rem 1.5rem; border-radius: 0.5rem; transition: all 0.2s; cursor: pointer; font-family: 'Cinzel', serif; letter-spacing: 0.05em; }
-    .btn-outline:hover { background: rgba(212,175,55,0.1); border-color: #D4AF37; }
-
-    @media (max-width: 768px) {
-      .nav-center-links { display: none; }
-      .mobile-menu { display: block; }
-    }
+    .btn-gold { background:#D4AF37; color:#091024; font-weight:700; padding:0.65rem 1.5rem; border-radius:0.5rem; transition:all 0.2s; cursor:pointer; font-family:'Cinzel',serif; letter-spacing:0.05em; }
+    .btn-gold:hover { background:#E8CC6A; box-shadow:0 0 20px rgba(212,175,55,0.4); }
+    .btn-outline { border:1px solid rgba(212,175,55,0.5); color:#D4AF37; padding:0.65rem 1.5rem; border-radius:0.5rem; transition:all 0.2s; cursor:pointer; font-family:'Cinzel',serif; letter-spacing:0.05em; }
+    .btn-outline:hover { background:rgba(212,175,55,0.1); border-color:#D4AF37; }
   </style>
 </head>
 <body class="min-h-screen transition-colors duration-300">
 
+<!-- ── DATA INJECTION (matches app.py _get_all_data keys exactly) ── -->
 <script>
-  const APP_DATA = {{ app_data | tojson }};
-  const INITIAL_PAGE = "{{ initial_page }}";
+  const _S   = JSON.parse('{{ settings   | safe }}');
+  const _C   = JSON.parse('{{ cards      | safe }}');
+  const _M   = JSON.parse('{{ ministries | safe }}');
+  const _SC  = JSON.parse('{{ schedules  | safe }}');
+  const _G   = JSON.parse('{{ gallery    | safe }}');
+  const _O   = JSON.parse('{{ officers   | safe }}');
+  const _LIT = JSON.parse('{{ liturgical | safe }}');
+  const INITIAL_PAGE = '{{ initial_page }}';
 </script>
 
 <!-- NAV -->
 <nav class="nav-bar sticky top-0 z-40 border-b">
   <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-    <!-- Logo -->
     <button onclick="navigate('home')" class="flex items-center gap-3 shrink-0">
       <div class="w-9 h-9 rounded-full border-2 border-gold flex items-center justify-center gold-glow">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
           <path d="M12 2L14 7H19L15 10.5L16.5 16L12 13L7.5 16L9 10.5L5 7H10L12 2Z" fill="#D4AF37"/>
           <rect x="11" y="16" width="2" height="6" rx="1" fill="#D4AF37"/>
           <rect x="8" y="20" width="8" height="1.5" rx="0.75" fill="#D4AF37"/>
         </svg>
       </div>
-      <span class="font-cinzel text-sm font-bold tracking-widest gold-text hidden sm:block">LITURGICAL CLUB</span>
+      <span id="nav-site-name" class="font-cinzel text-sm font-bold tracking-widest gold-text hidden sm:block">LITURGICAL CLUB</span>
     </button>
 
-    <!-- Center Nav -->
-    <div class="nav-center-links flex items-center gap-6 text-sm font-medium">
-      <button onclick="navigate('home')" class="nav-link" data-page="home">Home</button>
-      <button onclick="navigate('about')" class="nav-link" data-page="about">About</button>
-      <button onclick="navigate('ministries')" class="nav-link" data-page="ministries">Ministries</button>
-      <button onclick="navigate('schedules')" class="nav-link" data-page="schedules">Schedules</button>
-      <button onclick="navigate('gallery')" class="nav-link" data-page="gallery">Gallery</button>
-      <button onclick="navigate('join')" class="nav-link" data-page="join">Join</button>
+    <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+      <button onclick="navigate('home')"        class="nav-link" data-page="home">Home</button>
+      <button onclick="navigate('about')"       class="nav-link" data-page="about">About</button>
+      <button onclick="navigate('ministries')"  class="nav-link" data-page="ministries">Ministries</button>
+      <button onclick="navigate('schedules')"   class="nav-link" data-page="schedules">Schedules</button>
+      <button onclick="navigate('gallery')"     class="nav-link" data-page="gallery">Gallery</button>
+      <button onclick="navigate('join')"        class="nav-link" data-page="join">Join</button>
     </div>
 
-    <!-- Right Icons -->
     <div class="flex items-center gap-3 shrink-0">
       <a id="fb-link" href="#" target="_blank" class="opacity-60 hover:opacity-100 hover:text-gold transition-all" aria-label="Facebook">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
       </a>
-      <a id="ig-link" href="#" target="_blank" class="opacity-60 hover:opacity-100 hover:text-gold transition-all" aria-label="Instagram">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-      </a>
-      <button onclick="toggleTheme()" id="theme-toggle" class="opacity-60 hover:opacity-100 hover:text-gold transition-all" aria-label="Toggle theme">
-        <i data-lucide="sun" class="hidden" id="sun-icon" width="18" height="18"></i>
-        <i data-lucide="moon" id="moon-icon" width="18" height="18"></i>
+      <button onclick="toggleTheme()" class="opacity-60 hover:opacity-100 hover:text-gold transition-all" aria-label="Toggle theme">
+        <span id="sun-icon" class="hidden"><i data-lucide="sun" width="18" height="18"></i></span>
+        <span id="moon-icon"><i data-lucide="moon" width="18" height="18"></i></span>
       </button>
       <a href="/admin" class="opacity-60 hover:opacity-100 hover:text-gold transition-all" aria-label="Admin">
         <i data-lucide="settings" width="18" height="18"></i>
       </a>
-      <!-- Mobile hamburger -->
       <button class="md:hidden opacity-60 hover:opacity-100" onclick="toggleMobileMenu()">
         <i data-lucide="menu" width="20" height="20"></i>
       </button>
     </div>
   </div>
-  <!-- Mobile Menu -->
   <div id="mobile-menu" class="hidden md:hidden border-t gold-border px-4 py-3 flex flex-col gap-2 text-sm font-medium">
-    <button onclick="navigate('home');toggleMobileMenu()" class="text-left py-1">Home</button>
-    <button onclick="navigate('about');toggleMobileMenu()" class="text-left py-1">About</button>
+    <button onclick="navigate('home');toggleMobileMenu()"       class="text-left py-1">Home</button>
+    <button onclick="navigate('about');toggleMobileMenu()"      class="text-left py-1">About</button>
     <button onclick="navigate('ministries');toggleMobileMenu()" class="text-left py-1">Ministries</button>
-    <button onclick="navigate('schedules');toggleMobileMenu()" class="text-left py-1">Schedules</button>
-    <button onclick="navigate('gallery');toggleMobileMenu()" class="text-left py-1">Gallery</button>
-    <button onclick="navigate('join');toggleMobileMenu()" class="text-left py-1">Join</button>
+    <button onclick="navigate('schedules');toggleMobileMenu()"  class="text-left py-1">Schedules</button>
+    <button onclick="navigate('gallery');toggleMobileMenu()"    class="text-left py-1">Gallery</button>
+    <button onclick="navigate('join');toggleMobileMenu()"       class="text-left py-1">Join</button>
   </div>
 </nav>
 
-<!-- VIEWS CONTAINER -->
+<!-- MAIN -->
 <main>
 
-  <!-- HOME VIEW -->
+  <!-- HOME -->
   <div id="view-home" class="view">
-    <!-- Hero -->
     <section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      <div id="hero-bg" class="absolute inset-0 bg-cover bg-center" style="filter: brightness(0.3);"></div>
+      <div id="hero-bg" class="absolute inset-0 bg-cover bg-center" style="filter:brightness(0.3);"></div>
       <div class="hero-gradient absolute inset-0"></div>
       <div class="relative z-10 text-center px-4 max-w-4xl mx-auto">
         <div class="inline-flex items-center gap-2 gold-border rounded-full px-4 py-1 text-xs font-medium gold-text mb-6 glass">
-          <span class="vestment-dot bg-gold" style="color:#D4AF37"></span>
+          <span class="vestment-dot bg-gold" id="hero-season-dot" style="color:#D4AF37;background:#D4AF37;"></span>
           <span id="hero-season-label">Ordinary Time</span>
         </div>
-        <h1 id="hero-headline" class="font-cinzel text-4xl md:text-6xl font-black tracking-widest leading-tight gold-text mb-4">FAITH, REVERENCE & SERVICE</h1>
+        <h1 id="hero-title" class="font-cinzel text-4xl md:text-6xl font-black tracking-widest leading-tight gold-text mb-4">FAITH, REVERENCE &amp; SERVICE</h1>
         <p id="hero-subtitle" class="text-lg md:text-xl opacity-80 mb-8 max-w-xl mx-auto leading-relaxed italic">To serve at the altar is to serve the Lord.</p>
         <div class="flex gap-4 justify-center flex-wrap">
           <button onclick="navigate('join')" class="btn-gold">Join the Ministry</button>
@@ -195,50 +188,37 @@
       </div>
     </section>
 
-    <!-- Bento Info Cards -->
     <section class="max-w-7xl mx-auto px-4 py-16">
       <h2 class="font-cinzel text-2xl font-bold text-center gold-text mb-10 tracking-wider">OUR COMMUNITY</h2>
       <div id="info-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
     </section>
   </div>
 
-  <!-- ABOUT VIEW -->
+  <!-- ABOUT -->
   <div id="view-about" class="view">
     <div class="max-w-5xl mx-auto px-4 py-16">
       <div class="text-center mb-12">
         <h2 class="font-cinzel text-3xl font-bold gold-text tracking-wider mb-2">About Us</h2>
         <div class="w-24 h-0.5 bg-gold mx-auto opacity-50"></div>
       </div>
-      <!-- History -->
       <div class="card-bg gold-border rounded-2xl p-8 mb-8 gold-glow">
-        <h3 class="font-cinzel text-xl gold-text mb-4 flex items-center gap-2"><i data-lucide="book-open" width="20" height="20"></i> Our History</h3>
-        <p id="about-history" class="opacity-80 leading-relaxed"></p>
+        <h3 class="font-cinzel text-xl gold-text mb-4 flex items-center gap-2">
+          <i data-lucide="book-open" width="20" height="20"></i> Who We Are
+        </h3>
+        <p id="about-text" class="opacity-80 leading-relaxed"></p>
       </div>
-      <!-- Mission / Vision -->
-      <div class="grid md:grid-cols-2 gap-6 mb-8">
-        <div class="card-bg gold-border rounded-2xl p-6">
-          <h3 class="font-cinzel text-lg gold-text mb-3 flex items-center gap-2"><i data-lucide="target" width="18" height="18"></i> Mission</h3>
-          <p id="about-mission" class="opacity-80 leading-relaxed text-sm"></p>
-        </div>
-        <div class="card-bg gold-border rounded-2xl p-6">
-          <h3 class="font-cinzel text-lg gold-text mb-3 flex items-center gap-2"><i data-lucide="eye" width="18" height="18"></i> Vision</h3>
-          <p id="about-vision" class="opacity-80 leading-relaxed text-sm"></p>
-        </div>
-      </div>
-      <!-- Patron Saint -->
       <div class="card-bg gold-border rounded-2xl p-8 mb-12 text-center">
         <div class="w-20 h-20 rounded-full border-2 border-gold mx-auto mb-4 flex items-center justify-center gold-glow text-3xl">✝</div>
         <h3 class="font-cinzel text-xl gold-text mb-2">St. Tarcisius</h3>
         <p class="text-xs opacity-50 mb-3 uppercase tracking-wider">Patron Saint of Altar Servers</p>
-        <p class="opacity-80 leading-relaxed text-sm max-w-xl mx-auto">Saint Tarcisius was a young Christian martyr who died in the 3rd century defending the Eucharist. He is venerated as the patron saint of altar servers and First Communicants, a model of courage and devotion in service to the Lord.</p>
+        <p class="opacity-80 leading-relaxed text-sm max-w-xl mx-auto">Saint Tarcisius was a young Christian martyr who died in the 3rd century defending the Eucharist. He is venerated as the patron saint of altar servers and First Communicants — a model of courage and devotion in service to the Lord.</p>
       </div>
-      <!-- Officers -->
       <h3 class="font-cinzel text-xl gold-text mb-6 text-center tracking-wider">OUR OFFICERS</h3>
       <div id="officers-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5"></div>
     </div>
   </div>
 
-  <!-- MINISTRIES VIEW -->
+  <!-- MINISTRIES -->
   <div id="view-ministries" class="view">
     <div class="max-w-7xl mx-auto px-4 py-16">
       <div class="text-center mb-12">
@@ -250,25 +230,18 @@
     </div>
   </div>
 
-  <!-- SCHEDULES VIEW -->
+  <!-- SCHEDULES -->
   <div id="view-schedules" class="view">
     <div class="max-w-5xl mx-auto px-4 py-16">
       <div class="text-center mb-10">
         <h2 class="font-cinzel text-3xl font-bold gold-text tracking-wider mb-2">Schedules</h2>
         <div class="w-24 h-0.5 bg-gold mx-auto opacity-50"></div>
       </div>
-      <!-- Filter Bar -->
-      <div class="flex gap-2 flex-wrap justify-center mb-8">
-        <button onclick="filterSchedules('all')" class="schedule-filter active-filter btn-gold text-xs py-1.5 px-4" data-filter="all">All</button>
-        <button onclick="filterSchedules('mass')" class="schedule-filter btn-outline text-xs py-1.5 px-4" data-filter="mass">Mass</button>
-        <button onclick="filterSchedules('formation')" class="schedule-filter btn-outline text-xs py-1.5 px-4" data-filter="formation">Formation</button>
-        <button onclick="filterSchedules('event')" class="schedule-filter btn-outline text-xs py-1.5 px-4" data-filter="event">Events</button>
-      </div>
       <div id="schedules-list" class="space-y-4"></div>
     </div>
   </div>
 
-  <!-- GALLERY VIEW -->
+  <!-- GALLERY -->
   <div id="view-gallery" class="view">
     <div class="max-w-7xl mx-auto px-4 py-16">
       <div class="text-center mb-12">
@@ -279,7 +252,7 @@
     </div>
   </div>
 
-  <!-- JOIN VIEW -->
+  <!-- JOIN -->
   <div id="view-join" class="view">
     <div class="max-w-xl mx-auto px-4 py-16">
       <div class="text-center mb-10">
@@ -290,7 +263,7 @@
       <div id="join-success" class="hidden card-bg border border-green-500/40 rounded-2xl p-6 text-center mb-6">
         <i data-lucide="check-circle-2" width="40" height="40" class="text-green-400 mx-auto mb-2"></i>
         <p class="font-cinzel gold-text">Application Received!</p>
-        <p class="text-sm opacity-60 mt-1">We'll be in touch soon. God bless you!</p>
+        <p class="text-sm opacity-60 mt-1">We&#39;ll be in touch soon. God bless you!</p>
       </div>
       <div class="card-bg gold-border rounded-2xl p-8 gold-glow">
         <form id="join-form" onsubmit="submitJoinForm(event)" class="space-y-5">
@@ -299,26 +272,26 @@
             <input type="text" name="name" required placeholder="Your full name" />
           </div>
           <div>
-            <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Email Address *</label>
-            <input type="email" name="email" required placeholder="your@email.com" />
+            <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Age</label>
+            <input type="number" name="age" placeholder="Your age" />
           </div>
           <div>
             <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Contact Number</label>
-            <input type="tel" name="contact" placeholder="+63 9XX XXX XXXX" />
-          </div>
-          <div>
-            <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Year / Level</label>
-            <input type="text" name="year_level" placeholder="e.g. Grade 10, 2nd Year College" />
+            <input type="text" name="contact" placeholder="+63 9XX XXX XXXX" />
           </div>
           <div>
             <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Ministry of Interest</label>
             <select name="ministry" id="join-ministry-select">
-              <option value="">— Select Ministry —</option>
+              <option value="">&#8212; Select Ministry &#8212;</option>
             </select>
           </div>
           <div>
+            <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Prior Experience</label>
+            <textarea name="experience" rows="3" placeholder="Any liturgical or ministry experience..."></textarea>
+          </div>
+          <div>
             <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Why do you want to join?</label>
-            <textarea name="message" rows="4" placeholder="Share your heart..."></textarea>
+            <textarea name="note" rows="4" placeholder="Share your heart..."></textarea>
           </div>
           <button type="submit" class="btn-gold w-full text-center flex items-center justify-center gap-2">
             <i data-lucide="send" width="16" height="16"></i>
@@ -331,21 +304,19 @@
 
 </main>
 
-<!-- STATUS BAR (above footer) -->
+<!-- STATUS BAR -->
 <div class="status-bar py-3 mt-8">
   <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm">
-    <!-- Clock -->
     <div class="flex items-center gap-2 opacity-80">
       <i data-lucide="clock" width="15" height="15" class="gold-text"></i>
       <span class="font-mono font-semibold" id="pht-clock">--:--:-- --</span>
       <span class="text-xs opacity-50">PHT (GMT+8)</span>
     </div>
     <span class="hidden sm:block opacity-20">|</span>
-    <!-- Liturgical Season -->
     <div class="flex items-center gap-2">
-      <span id="season-pill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border border-current/20" style="background: rgba(0,0,0,0.2);">
-        <span id="season-dot" class="vestment-dot" style="color: #3b82f6; background: #3b82f6;"></span>
-        <span id="season-label-text" class="font-cinzel tracking-wide">Loading...</span>
+      <span id="season-pill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border border-current/20" style="background:rgba(0,0,0,0.2);">
+        <span id="season-dot" class="vestment-dot" style="color:#2E7D32;background:#2E7D32;"></span>
+        <span id="season-label-text" class="font-cinzel tracking-wide">Ordinary Time</span>
       </span>
     </div>
   </div>
@@ -354,7 +325,7 @@
 <!-- FOOTER -->
 <footer class="py-8 text-center border-t gold-border">
   <p id="footer-text" class="rainbow-text text-sm font-semibold tracking-wide font-cinzel"></p>
-  <p class="text-xs opacity-30 mt-2">{{ app_data.settings.club_name | default('Liturgical Club') }} &mdash; In Nomine Patris</p>
+  <p id="footer-sub" class="text-xs opacity-30 mt-2"></p>
 </footer>
 
 <!-- LIGHTBOX -->
@@ -374,7 +345,7 @@
       </div>
       <span id="player-title" class="text-xs font-medium truncate max-w-[130px] opacity-80">Sacred Music</span>
       <button onclick="togglePlay()" id="play-btn" class="ml-auto shrink-0">
-        <i data-lucide="play" id="play-icon" width="18" height="18" class="gold-text"></i>
+        <i data-lucide="play"  id="play-icon"  width="18" height="18" class="gold-text"></i>
         <i data-lucide="pause" id="pause-icon" width="18" height="18" class="gold-text hidden"></i>
       </button>
     </div>
@@ -386,332 +357,302 @@
     </div>
   </div>
 </div>
-
 <audio id="bg-audio" loop></audio>
 
 <script>
-  // ---- DATA ----
-  const settings   = APP_DATA.settings   || {};
-  const cards      = APP_DATA.cards      || [];
-  const ministries = APP_DATA.ministries || [];
-  const schedules  = APP_DATA.schedules  || [];
-  const gallery    = APP_DATA.gallery    || [];
-  const officers   = APP_DATA.officers   || [];
-  const liturgical = APP_DATA.liturgical || {};
+// ── THEME ──────────────────────────────────────────────────────────────────
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('sun-icon').classList.toggle('hidden', t !== 'dark');
+  document.getElementById('moon-icon').classList.toggle('hidden', t === 'dark');
+  try { localStorage.setItem('theme', t); } catch(e) {}
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+(function() {
+  let saved = 'dark';
+  try { saved = localStorage.getItem('theme') || 'dark'; } catch(e) {}
+  applyTheme(saved);
+})();
 
-  // ---- THEME ----
-  function applyTheme(t) {
-    document.documentElement.setAttribute('data-theme', t);
-    document.getElementById('sun-icon').classList.toggle('hidden', t !== 'dark');
-    document.getElementById('moon-icon').classList.toggle('hidden', t === 'dark');
-    try { localStorage.setItem('theme', t); } catch(e) {}
+// ── NAVIGATION ─────────────────────────────────────────────────────────────
+const PAGE_PATHS = { home:'/', about:'/about', ministries:'/ministries', schedules:'/schedules', gallery:'/gallery', join:'/join' };
+const PATH_PAGES = Object.fromEntries(Object.entries(PAGE_PATHS).map(([k,v])=>[v,k]));
+
+function navigate(page, pushState=true) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const view = document.getElementById('view-' + page);
+  if (view) view.classList.add('active');
+  document.querySelectorAll(`[data-page="${page}"]`).forEach(l => l.classList.add('active'));
+  if (pushState) {
+    try { history.pushState({ page }, '', PAGE_PATHS[page] || '/'); } catch(e) {}
   }
-  function toggleTheme() {
-    const cur = document.documentElement.getAttribute('data-theme');
-    applyTheme(cur === 'dark' ? 'light' : 'dark');
-  }
-  (function() {
-    let saved = 'dark';
-    try { saved = localStorage.getItem('theme') || 'dark'; } catch(e) {}
-    applyTheme(saved);
-  })();
+  window.scrollTo({ top:0, behavior:'smooth' });
+  lucide.createIcons();
+}
 
-  // ---- NAVIGATION ----
-  const PAGE_PATHS = { home:'/', about:'/about', ministries:'/ministries', schedules:'/schedules', gallery:'/gallery', join:'/join' };
-  const PATH_PAGES = Object.fromEntries(Object.entries(PAGE_PATHS).map(([k,v])=>[v,k]));
+window.addEventListener('popstate', e => {
+  navigate(e.state && e.state.page ? e.state.page : (PATH_PAGES[location.pathname] || 'home'), false);
+});
 
-  function navigate(page, pushState=true) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    const view = document.getElementById('view-' + page);
-    if (view) view.classList.add('active');
-    document.querySelectorAll(`[data-page="${page}"]`).forEach(l => l.classList.add('active'));
-    if (pushState) {
-      try { history.pushState({ page }, '', PAGE_PATHS[page] || '/'); } catch(e) {}
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    lucide.createIcons();
-  }
+function toggleMobileMenu() {
+  document.getElementById('mobile-menu').classList.toggle('hidden');
+}
 
-  window.addEventListener('popstate', e => {
-    if (e.state && e.state.page) navigate(e.state.page, false);
-    else {
-      const p = PATH_PAGES[location.pathname] || 'home';
-      navigate(p, false);
-    }
+// ── CLOCK ──────────────────────────────────────────────────────────────────
+function updateClock() {
+  const pht = new Date(new Date().toLocaleString('en-US', { timeZone:'Asia/Manila' }));
+  let h = pht.getHours(), m = pht.getMinutes(), s = pht.getSeconds();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  document.getElementById('pht-clock').textContent =
+    `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} ${ampm}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── LITURGICAL SEASON DISPLAY ──────────────────────────────────────────────
+// _LIT keys from app.py: season, week_label, color, color_hex, is_override
+function renderSeason() {
+  const label = _LIT.week_label || _LIT.season || 'Ordinary Time';
+  const hex   = _LIT.color_hex  || '#2E7D32';
+
+  document.getElementById('season-label-text').textContent  = label;
+  document.getElementById('hero-season-label').textContent   = label;
+
+  ['season-dot','hero-season-dot'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.background = hex; el.style.color = hex; }
   });
 
-  function toggleMobileMenu() {
-    document.getElementById('mobile-menu').classList.toggle('hidden');
-  }
+  const pill = document.getElementById('season-pill');
+  if (pill) pill.style.color = hex;
+}
 
-  // ---- CLOCK ----
-  function updateClock() {
-    const now = new Date();
-    const pht = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
-    let h = pht.getHours(), m = pht.getMinutes(), s = pht.getSeconds();
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    h = h % 12 || 12;
-    document.getElementById('pht-clock').textContent =
-      `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} ${ampm}`;
-  }
-  setInterval(updateClock, 1000);
-  updateClock();
+// ── RENDER: HERO ───────────────────────────────────────────────────────────
+function renderHero() {
+  // site_name in nav
+  const siteName = _S.site_name || 'Liturgical Club';
+  document.getElementById('nav-site-name').textContent = siteName.toUpperCase();
+  document.getElementById('page-title').textContent    = siteName;
+  document.getElementById('footer-sub').textContent    = siteName + ' \u2014 In Nomine Patris';
 
-  // ---- LITURGICAL SEASON ----
-  function getLiturgicalSeason() {
-    if (liturgical.override && liturgical.custom_label) {
-      return { label: liturgical.custom_label, color: liturgical.color || '#3b82f6' };
-    }
-    // Auto-calculate
-    const now = new Date();
-    const year = now.getFullYear();
-    function easterDate(y) {
-      const a = y%19, b = Math.floor(y/100), c = y%100;
-      const d = Math.floor(b/4), e = b%4, f = Math.floor((b+8)/25);
-      const g = Math.floor((b-f+1)/3), h = (19*a+b-d-g+15)%30;
-      const i = Math.floor(c/4), k = c%4, l = (32+2*e+2*i-h-k)%7;
-      const m = Math.floor((a+11*h+22*l)/451);
-      const month = Math.floor((h+l-7*m+114)/31)-1;
-      const day = ((h+l-7*m+114)%31)+1;
-      return new Date(y, month, day);
-    }
-    const easter = easterDate(year);
-    const doy = n => Math.floor((n - new Date(n.getFullYear(),0,0)) / 86400000);
-    const nd = doy(now), ne = doy(easter);
-    const diff = nd - ne;
-    if (diff >= -46 && diff < -6) return { label: 'Lenten Season', color: '#7c3aed' };
-    if (diff >= -6 && diff < 0)   return { label: 'Holy Week', color: '#7c3aed' };
-    if (diff === 0)                return { label: 'Easter Sunday', color: '#fbbf24' };
-    if (diff > 0 && diff <= 49)   return { label: 'Easter Season', color: '#fbbf24' };
-    if (diff > 49 && diff <= 59)  return { label: 'Pentecost', color: '#dc2626' };
-    const dec = new Date(year,11,1); const nd2 = doy(now), nd3 = doy(dec);
-    const sundayBefore = (d) => { const day=d.getDay(); return new Date(d.getTime()-day*86400000); };
-    const advent1 = sundayBefore(new Date(year,11,25));
-    const nd4 = doy(advent1);
-    if (nd >= nd4) return { label: 'Advent', color: '#7c3aed' };
-    const christmas = new Date(year,11,25);
-    if (nd >= doy(christmas)) return { label: 'Christmas Season', color: '#fbbf24' };
-    const ordWeek = Math.floor((nd - ne - 49) / 7) + 10;
-    return { label: `${ordWeek}th Week in Ordinary Time`, color: '#16a34a' };
-  }
+  if (_S.hero_title)    document.getElementById('hero-title').textContent    = _S.hero_title;
+  if (_S.hero_subtitle) document.getElementById('hero-subtitle').textContent = _S.hero_subtitle;
 
-  function renderSeason() {
-    const override = liturgical.override;
-    const lbl = override && liturgical.custom_label ? liturgical.custom_label
-              : (liturgical.auto_label || getLiturgicalSeason().label);
-    const col = (override && liturgical.color) ? liturgical.color : getLiturgicalSeason().color;
-    document.getElementById('season-label-text').textContent = lbl;
-    document.getElementById('hero-season-label').textContent = lbl;
-    const dot = document.getElementById('season-dot');
-    dot.style.background = col; dot.style.color = col;
-    const pill = document.getElementById('season-pill');
-    pill.style.color = col;
+  if (_S.hero_image_url) {
+    const bg = document.getElementById('hero-bg');
+    bg.style.backgroundImage = `url('${_S.hero_image_url}')`;
   }
-  renderSeason();
+  if (_S.facebook_url) document.getElementById('fb-link').href = _S.facebook_url;
 
-  // ---- RENDER FUNCTIONS ----
-  function renderHero() {
-    if (settings.hero_headline) document.getElementById('hero-headline').textContent = settings.hero_headline;
-    if (settings.hero_subtitle) document.getElementById('hero-subtitle').textContent = settings.hero_subtitle;
-    if (settings.hero_image_url) {
-      const bg = document.getElementById('hero-bg');
-      bg.style.backgroundImage = `url('${settings.hero_image_url}')`;
-      bg.style.display = 'block';
-    }
-    if (settings.facebook_url) document.getElementById('fb-link').href = settings.facebook_url;
-    if (settings.instagram_url) document.getElementById('ig-link').href = settings.instagram_url;
-    document.getElementById('footer-text').textContent = settings.footer_text || '© 2026 Liturgical Club | Developed by: Begie';
+  document.getElementById('footer-text').textContent =
+    _S.footer_rainbow_text || siteName + ' \u00b7 Serving with Joy';
+}
+
+// ── RENDER: INFO CARDS ─────────────────────────────────────────────────────
+// _C keys: id, title, body, icon, order_index
+function renderInfoCards() {
+  const grid = document.getElementById('info-cards-grid');
+  if (!_C.length) {
+    grid.innerHTML = '<p class="col-span-3 text-center opacity-40 py-10">No info cards configured.</p>';
+    return;
   }
+  grid.innerHTML = _C.map(c => `
+    <div class="card-bg gold-border rounded-2xl p-6 gold-glow hover:scale-[1.02] transition-transform">
+      <div class="text-3xl mb-3">${esc(c.icon) || '✦'}</div>
+      <h3 class="font-cinzel text-base font-bold gold-text mb-2">${esc(c.title)}</h3>
+      <p class="text-sm opacity-70 leading-relaxed">${esc(c.body)}</p>
+    </div>`).join('');
+}
 
-  function renderInfoCards() {
-    const grid = document.getElementById('info-cards-grid');
-    if (!cards.length) {
-      grid.innerHTML = '<p class="col-span-3 text-center opacity-40 py-10">No info cards configured.</p>';
-      return;
-    }
-    grid.innerHTML = cards.map(c => `
-      <div class="card-bg gold-border rounded-2xl p-6 gold-glow hover:scale-[1.02] transition-transform">
-        <div class="text-3xl mb-3">${c.icon || '✦'}</div>
-        <h3 class="font-cinzel text-base font-bold gold-text mb-2">${c.title || ''}</h3>
-        <p class="text-sm opacity-70 leading-relaxed">${c.body || ''}</p>
-      </div>`).join('');
+// ── RENDER: ABOUT ──────────────────────────────────────────────────────────
+// _S key: about_text
+function renderAbout() {
+  document.getElementById('about-text').textContent =
+    _S.about_text || 'The Liturgical Club is dedicated to serving at the altar with reverence and devotion.';
+}
+
+// ── RENDER: OFFICERS ───────────────────────────────────────────────────────
+// _O keys: id, name, position, image_url, bio, order_index
+function renderOfficers() {
+  const grid = document.getElementById('officers-grid');
+  if (!_O.length) {
+    grid.innerHTML = '<p class="col-span-4 text-center opacity-40 py-6">No officers listed.</p>';
+    return;
   }
+  grid.innerHTML = _O.map(o => `
+    <div class="card-bg gold-border rounded-xl p-4 text-center hover:scale-105 transition-transform">
+      <div class="w-16 h-16 rounded-full border-2 border-gold mx-auto mb-3 overflow-hidden flex items-center justify-center bg-navy-card">
+        ${o.image_url
+          ? `<img src="${esc(o.image_url)}" alt="${esc(o.name)}" class="w-full h-full object-cover" onerror="this.style.display='none'" />`
+          : `<i data-lucide="user" width="28" height="28" class="opacity-40"></i>`}
+      </div>
+      <p class="font-cinzel text-xs font-bold gold-text">${esc(o.name)}</p>
+      <p class="text-xs opacity-50 mt-0.5">${esc(o.position)}</p>
+      ${o.bio ? `<p class="text-xs opacity-40 mt-1 leading-relaxed">${esc(o.bio)}</p>` : ''}
+    </div>`).join('');
+}
 
-  function renderAbout() {
-    document.getElementById('about-history').textContent = settings.history || 'The Liturgical Club was founded to serve at the altar with reverence and dedication.';
-    document.getElementById('about-mission').textContent = settings.mission || 'To form altar servers who are spiritually grounded, liturgically trained, and committed to serving the parish community.';
-    document.getElementById('about-vision').textContent = settings.vision || 'A vibrant community of young ministers whose lives reflect the love of God through faithful service.';
+// ── RENDER: MINISTRIES ─────────────────────────────────────────────────────
+// _M keys: id, name, description, image_url, order_index
+function renderMinistries() {
+  const grid = document.getElementById('ministries-grid');
+  const sel  = document.getElementById('join-ministry-select');
+
+  if (!_M.length) {
+    grid.innerHTML = '<p class="col-span-3 text-center opacity-40 py-10">No ministries configured.</p>';
+    return;
   }
+  grid.innerHTML = _M.map(m => `
+    <div class="ministry-card card-bg gold-border rounded-2xl overflow-hidden gold-glow flex flex-col">
+      ${m.image_url
+        ? `<div class="h-40 bg-cover bg-center" style="background-image:url('${esc(m.image_url)}');filter:brightness(0.7);"></div>`
+        : `<div class="h-40 flex items-center justify-center opacity-20"><i data-lucide="church" width="48" height="48"></i></div>`}
+      <div class="p-6 flex flex-col flex-1">
+        <h3 class="font-cinzel text-base font-bold gold-text mb-2">${esc(m.name)}</h3>
+        <p class="text-sm opacity-70 mb-4 leading-relaxed flex-1">${esc(m.description)}</p>
+        <button onclick="applyMinistry('${esc(m.name)}')" class="btn-gold text-xs py-2 mt-auto">Apply Now</button>
+      </div>
+    </div>`).join('');
 
-  function renderOfficers() {
-    const grid = document.getElementById('officers-grid');
-    if (!officers.length) { grid.innerHTML = '<p class="col-span-4 text-center opacity-40 py-6">No officers listed.</p>'; return; }
-    grid.innerHTML = officers.map(o => `
-      <div class="card-bg gold-border rounded-xl p-4 text-center hover:scale-105 transition-transform">
-        <div class="w-16 h-16 rounded-full border-2 border-gold mx-auto mb-3 overflow-hidden bg-navy-card flex items-center justify-center">
-          ${o.photo_url ? `<img src="${o.photo_url}" alt="${o.name}" class="w-full h-full object-cover" onerror="this.style.display='none'" />` : `<i data-lucide="user" width="28" height="28" class="opacity-40"></i>`}
-        </div>
-        <p class="font-cinzel text-xs font-bold gold-text">${o.name || ''}</p>
-        <p class="text-xs opacity-50 mt-0.5">${o.position || ''}</p>
-      </div>`).join('');
+  sel.innerHTML = '<option value="">&#8212; Select Ministry &#8212;</option>' +
+    _M.map(m => `<option value="${esc(m.name)}">${esc(m.name)}</option>`).join('');
+}
+
+function applyMinistry(name) {
+  navigate('join');
+  setTimeout(() => { document.getElementById('join-ministry-select').value = name; }, 120);
+}
+
+// ── RENDER: SCHEDULES ──────────────────────────────────────────────────────
+// _SC keys: id, title, day_time, location, description, order_index
+function renderSchedules() {
+  const list = document.getElementById('schedules-list');
+  if (!_SC.length) {
+    list.innerHTML = '<p class="text-center opacity-40 py-10">No schedules found.</p>';
+    return;
   }
+  list.innerHTML = _SC.map(s => `
+    <div class="schedule-card card-bg gold-border rounded-xl px-6 py-4 flex items-start gap-4">
+      <div class="shrink-0 w-10 h-10 rounded-full border border-gold/30 flex items-center justify-center gold-text">
+        <i data-lucide="calendar" width="18" height="18"></i>
+      </div>
+      <div class="flex-1">
+        <h4 class="font-cinzel text-sm font-bold mb-1">${esc(s.title)}</h4>
+        <p class="text-xs opacity-60">${esc(s.day_time)}${s.location ? ' &middot; ' + esc(s.location) : ''}</p>
+        ${s.description ? `<p class="text-xs opacity-50 mt-1">${esc(s.description)}</p>` : ''}
+      </div>
+    </div>`).join('');
+}
 
-  function renderMinistries() {
-    const grid = document.getElementById('ministries-grid');
-    const sel = document.getElementById('join-ministry-select');
-    if (!ministries.length) { grid.innerHTML = '<p class="col-span-3 text-center opacity-40 py-10">No ministries configured.</p>'; return; }
-    grid.innerHTML = ministries.map(m => `
-      <div class="ministry-card card-bg gold-border rounded-2xl p-6 gold-glow flex flex-col">
-        <div class="text-3xl mb-3">${m.icon || '⛪'}</div>
-        <h3 class="font-cinzel text-base font-bold gold-text mb-2">${m.name || ''}</h3>
-        <p class="text-sm opacity-70 mb-3 leading-relaxed flex-1">${m.description || ''}</p>
-        ${m.schedule ? `<p class="text-xs opacity-50 mb-1 flex items-center gap-1"><i data-lucide="calendar" width="12" height="12"></i> ${m.schedule}</p>` : ''}
-        ${m.requirements ? `<p class="text-xs opacity-50 mb-3 flex items-center gap-1"><i data-lucide="clipboard-list" width="12" height="12"></i> ${m.requirements}</p>` : ''}
-        <button onclick="applyMinistry('${m.name}')" class="btn-gold text-xs py-2 mt-auto">Apply Now</button>
-      </div>`).join('');
-    sel.innerHTML = '<option value="">— Select Ministry —</option>' +
-      ministries.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+// ── RENDER: GALLERY ────────────────────────────────────────────────────────
+// _G keys: id, title, image_url, caption, order_index
+function renderGallery() {
+  const grid = document.getElementById('gallery-grid');
+  if (!_G.length) {
+    grid.innerHTML = '<p class="col-span-4 text-center opacity-40 py-10">No gallery images.</p>';
+    return;
   }
+  grid.innerHTML = _G.map(g => `
+    <div class="relative group cursor-pointer overflow-hidden rounded-xl aspect-square gold-border"
+         onclick="openLightbox('${esc(g.image_url)}','${esc(g.caption || g.title)}')">
+      <img src="${esc(g.image_url)}" alt="${esc(g.caption || g.title)}"
+           class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+           loading="lazy" onerror="this.parentElement.classList.add('opacity-30')" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
+        <p class="text-xs text-white truncate">${esc(g.caption || g.title)}</p>
+      </div>
+    </div>`).join('');
+}
 
-  function applyMinistry(name) {
-    navigate('join');
-    setTimeout(() => {
-      const sel = document.getElementById('join-ministry-select');
-      sel.value = name;
-    }, 100);
-  }
+function openLightbox(url) {
+  document.getElementById('lightbox-img').src = url;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
-  function renderSchedules(filter='all') {
-    const list = document.getElementById('schedules-list');
-    const filtered = filter === 'all' ? schedules : schedules.filter(s => (s.type||'').toLowerCase() === filter);
-    if (!filtered.length) { list.innerHTML = '<p class="text-center opacity-40 py-10">No schedules found.</p>'; return; }
-    const typeColors = { mass: 'text-red-400', formation: 'text-blue-400', event: 'text-gold' };
-    list.innerHTML = filtered.map(s => `
-      <div class="schedule-card card-bg gold-border rounded-xl px-6 py-4 flex items-start gap-4">
-        <div class="shrink-0 w-10 h-10 rounded-full border border-gold/30 flex items-center justify-center ${typeColors[s.type]||'text-gold'}">
-          <i data-lucide="${s.type==='mass'?'church':s.type==='formation'?'graduation-cap':'calendar-days'}" width="18" height="18"></i>
-        </div>
-        <div class="flex-1">
-          <div class="flex items-center gap-2 flex-wrap mb-1">
-            <h4 class="font-cinzel text-sm font-bold">${s.title || ''}</h4>
-            <span class="text-xs px-2 py-0.5 rounded-full border border-current/20 ${typeColors[s.type]||'text-gold'} capitalize">${s.type||'event'}</span>
-          </div>
-          <p class="text-xs opacity-60">${s.datetime || ''} ${s.location ? '· '+s.location : ''}</p>
-          ${s.notes ? `<p class="text-xs opacity-50 mt-1">${s.notes}</p>` : ''}
-        </div>
-      </div>`).join('');
-  }
+// ── MUSIC ──────────────────────────────────────────────────────────────────
+function initMusic() {
+  const src = _S.background_music_url;
+  if (!src) return;
+  const audio  = document.getElementById('bg-audio');
+  const player = document.getElementById('mini-player');
+  audio.src    = src;
+  audio.volume = 0.4;
+  player.style.display = 'block';
+  function tryPlay() { audio.play().then(() => updatePlayUI(true)).catch(() => {}); }
+  document.addEventListener('click',  tryPlay, { once:true });
+  document.addEventListener('scroll', tryPlay, { once:true });
+}
+function togglePlay() {
+  const a = document.getElementById('bg-audio');
+  if (a.paused) { a.play(); updatePlayUI(true); } else { a.pause(); updatePlayUI(false); }
+}
+function updatePlayUI(playing) {
+  document.getElementById('play-icon').classList.toggle('hidden', playing);
+  document.getElementById('pause-icon').classList.toggle('hidden', !playing);
+}
 
-  function filterSchedules(type) {
-    document.querySelectorAll('.schedule-filter').forEach(b => {
-      b.classList.toggle('btn-gold', b.dataset.filter === type);
-      b.classList.toggle('btn-outline', b.dataset.filter !== type);
+// ── JOIN FORM ──────────────────────────────────────────────────────────────
+async function submitJoinForm(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn  = form.querySelector('button[type=submit]');
+  const data = Object.fromEntries(new FormData(form));
+  btn.disabled    = true;
+  btn.textContent = 'Sending\u2026';
+  try {
+    const res = await fetch('/api/join', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify(data),
     });
-    renderSchedules(type);
-    lucide.createIcons();
-  }
-
-  function renderGallery() {
-    const grid = document.getElementById('gallery-grid');
-    if (!gallery.length) { grid.innerHTML = '<p class="col-span-4 text-center opacity-40 py-10">No gallery images.</p>'; return; }
-    grid.innerHTML = gallery.map((g, i) => `
-      <div class="relative group cursor-pointer overflow-hidden rounded-xl aspect-square bg-navy-card gold-border" onclick="openLightbox('${g.url}','${g.caption||''}')">
-        <img src="${g.url}" alt="${g.caption||''}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" onerror="this.parentElement.classList.add('opacity-30')" />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
-          <p class="text-xs text-white truncate">${g.caption||''}</p>
-        </div>
-      </div>`).join('');
-  }
-
-  function openLightbox(url, caption) {
-    document.getElementById('lightbox-img').src = url;
-    document.getElementById('lightbox').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
-
-  // ---- MUSIC ----
-  function initMusic() {
-    const audio = document.getElementById('bg-audio');
-    const player = document.getElementById('mini-player');
-    if (!settings.music_enabled || !settings.music_url) return;
-    audio.src = settings.music_url;
-    audio.volume = 0.4;
-    player.style.display = 'block';
-    if (settings.music_title) document.getElementById('player-title').textContent = settings.music_title;
-    function tryPlay() {
-      audio.play().then(() => updatePlayUI(true)).catch(() => {});
-    }
-    document.addEventListener('click', tryPlay, { once: true });
-    document.addEventListener('scroll', tryPlay, { once: true });
-    tryPlay();
-  }
-
-  function togglePlay() {
-    const a = document.getElementById('bg-audio');
-    if (a.paused) { a.play(); updatePlayUI(true); }
-    else { a.pause(); updatePlayUI(false); }
-  }
-
-  function updatePlayUI(playing) {
-    document.getElementById('play-icon').classList.toggle('hidden', playing);
-    document.getElementById('pause-icon').classList.toggle('hidden', !playing);
-  }
-
-  // ---- JOIN FORM ----
-  async function submitJoinForm(e) {
-    e.preventDefault();
-    const form = e.target;
-    const data = Object.fromEntries(new FormData(form));
-    const btn = form.querySelector('button[type=submit]');
-    btn.disabled = true;
-    btn.textContent = 'Sending...';
-    try {
-      const res = await fetch('/api/join', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (res.ok) {
-        form.reset();
-        document.getElementById('join-success').classList.remove('hidden');
-        lucide.createIcons();
-        setTimeout(() => document.getElementById('join-success').classList.add('hidden'), 6000);
-      } else {
-        alert('Submission failed. Please try again.');
-      }
-    } catch (err) {
-      alert('Network error. Please try again.');
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = '<i data-lucide="send" width="16" height="16"></i> Submit Application';
+    if (res.ok) {
+      form.reset();
+      const ok = document.getElementById('join-success');
+      ok.classList.remove('hidden');
       lucide.createIcons();
-    }
-  }
-
-  // ---- INIT ----
-  function init() {
-    renderHero();
-    renderInfoCards();
-    renderAbout();
-    renderOfficers();
-    renderMinistries();
-    renderSchedules();
-    renderGallery();
-    initMusic();
-
-    // Initial page from server
-    const initPage = INITIAL_PAGE || (PATH_PAGES[location.pathname] || 'home');
-    navigate(initPage, false);
-
+      setTimeout(() => ok.classList.add('hidden'), 6000);
+    } else { alert('Submission failed. Please try again.'); }
+  } catch { alert('Network error. Please try again.'); }
+  finally {
+    btn.disabled    = false;
+    btn.innerHTML   = '<i data-lucide="send" width="16" height="16"></i> Submit Application';
     lucide.createIcons();
   }
-  init();
+}
+
+// ── HELPER: HTML escape ────────────────────────────────────────────────────
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+function init() {
+  renderHero();
+  renderSeason();
+  renderInfoCards();
+  renderAbout();
+  renderOfficers();
+  renderMinistries();
+  renderSchedules();
+  renderGallery();
+  initMusic();
+
+  const initPage = INITIAL_PAGE || PATH_PAGES[location.pathname] || 'home';
+  navigate(initPage, false);
+  lucide.createIcons();
+}
+init();
 </script>
 </body>
 </html>
