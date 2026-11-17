@@ -1,658 +1,790 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title id="page-title">Liturgical Club</title>
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/umd/lucide.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      darkMode: ['attribute', '[data-theme="dark"]'],
-      theme: {
-        extend: {
-          colors: {
-            navy: { DEFAULT: '#091024', card: '#0F1A38', light: '#152040' },
-            gold: { DEFAULT: '#D4AF37', light: '#E8CC6A', dim: '#8B7220' },
-          },
-          fontFamily: {
-            cinzel: ['Cinzel', 'serif'],
-            jakarta: ['Plus Jakarta Sans', 'sans-serif'],
-          },
-        },
-      },
-    };
-  </script>
-  <style>
-    :root { --gold: #D4AF37; --navy: #091024; --card: #0F1A38; }
-    * { font-family: 'Plus Jakarta Sans', sans-serif; }
-    h1,h2,h3,.font-cinzel { font-family: 'Cinzel', serif; }
-
-    [data-theme="dark"] body  { background:#091024; color:#e8e0d0; }
-    [data-theme="light"] body { background:#f4f0e8; color:#1a1200; }
-    [data-theme="light"] .nav-bar  { background:rgba(244,240,232,0.95); border-color:rgba(212,175,55,0.3); }
-    [data-theme="light"] .card-bg  { background:#fff8e8; border-color:rgba(212,175,55,0.3); }
-    [data-theme="dark"]  .nav-bar  { background:rgba(9,16,36,0.95);  border-color:rgba(212,175,55,0.15); }
-    [data-theme="dark"]  .card-bg  { background:#0F1A38; border-color:rgba(212,175,55,0.2); }
-
-    .gold-border { border:1px solid rgba(212,175,55,0.3); }
-    .gold-text   { color:#D4AF37; }
-    .gold-glow   { box-shadow:0 0 20px rgba(212,175,55,0.15); }
-
-    .rainbow-text {
-      background:linear-gradient(90deg,#ff0000,#ff7700,#ffdd00,#00dd00,#0099ff,#aa00ff,#ff0099,#ff0000);
-      background-size:200% auto;
-      -webkit-background-clip:text; background-clip:text;
-      -webkit-text-fill-color:transparent;
-      animation:rainbow-move 4s linear infinite;
-    }
-    @keyframes rainbow-move { to { background-position:200% center; } }
-
-    .nav-link { position:relative; padding-bottom:2px; transition:color 0.2s; }
-    .nav-link.active::after,.nav-link:hover::after {
-      content:''; position:absolute; bottom:-2px; left:0; right:0;
-      height:2px; background:#D4AF37; border-radius:1px;
-    }
-    .nav-link.active { color:#D4AF37; }
-
-    .view { display:none; animation:fadeIn 0.3s ease; }
-    .view.active { display:block; }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
-
-    .glass { background:rgba(15,26,56,0.7); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
-    [data-theme="light"] .glass { background:rgba(255,248,232,0.85); }
-
-    .hero-gradient { background:linear-gradient(135deg,rgba(9,16,36,0.97) 0%,rgba(15,26,56,0.9) 50%,rgba(9,16,36,0.97) 100%); }
-    [data-theme="light"] .hero-gradient { background:linear-gradient(135deg,rgba(244,240,232,0.95) 0%,rgba(255,248,232,0.9) 100%); }
-
-    .vestment-dot { width:10px; height:10px; border-radius:50%; animation:glow-pulse 2s ease-in-out infinite; }
-    @keyframes glow-pulse { 0%,100%{box-shadow:0 0 4px 1px currentColor;} 50%{box-shadow:0 0 10px 3px currentColor;} }
-
-    .lightbox-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:1000; display:none; align-items:center; justify-content:center; }
-    .lightbox-overlay.open { display:flex; }
-
-    .mini-player { position:fixed; bottom:1.5rem; right:1.5rem; z-index:50; }
-    .mini-player-inner { background:rgba(15,26,56,0.85); backdrop-filter:blur(16px); border:1px solid rgba(212,175,55,0.3); border-radius:1rem; padding:0.75rem 1rem; min-width:220px; }
-    [data-theme="light"] .mini-player-inner { background:rgba(255,248,232,0.9); }
-
-    .schedule-card:hover,.ministry-card:hover { transform:translateY(-2px); transition:transform 0.2s; }
-
-    .status-bar { border-top:1px solid rgba(212,175,55,0.15); border-bottom:1px solid rgba(212,175,55,0.15); }
-    [data-theme="dark"] .status-bar { background:rgba(15,26,56,0.6); }
-    [data-theme="light"] .status-bar { background:rgba(255,248,232,0.8); }
-
-    input,textarea,select {
-      background:rgba(9,16,36,0.6); border:1px solid rgba(212,175,55,0.25);
-      color:inherit; border-radius:0.5rem; padding:0.6rem 0.9rem; width:100%;
-      outline:none; transition:border-color 0.2s;
-    }
-    [data-theme="light"] input,[data-theme="light"] textarea,[data-theme="light"] select {
-      background:rgba(255,248,232,0.8); color:#1a1200;
-    }
-    input:focus,textarea:focus,select:focus { border-color:#D4AF37; }
-
-    .btn-gold { background:#D4AF37; color:#091024; font-weight:700; padding:0.65rem 1.5rem; border-radius:0.5rem; transition:all 0.2s; cursor:pointer; font-family:'Cinzel',serif; letter-spacing:0.05em; }
-    .btn-gold:hover { background:#E8CC6A; box-shadow:0 0 20px rgba(212,175,55,0.4); }
-    .btn-outline { border:1px solid rgba(212,175,55,0.5); color:#D4AF37; padding:0.65rem 1.5rem; border-radius:0.5rem; transition:all 0.2s; cursor:pointer; font-family:'Cinzel',serif; letter-spacing:0.05em; }
-    .btn-outline:hover { background:rgba(212,175,55,0.1); border-color:#D4AF37; }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>{{ settings|tojson|safe|replace('"','')|replace('{','') }}{{ settings }}</title>
+<title id="page-title">Liturgical Club</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --gold: #D4AF37;
+    --gold-light: #F0D060;
+    --navy: #070D1F;
+    --navy-card: #0E1836;
+    --navy-mid: #0A1428;
+    --text-primary: #F0E8D0;
+    --text-secondary: #A8BFD8;
+    color-scheme: dark;
+  }
+  html.light {
+    --navy: #F0F4FF;
+    --navy-card: #FFFFFF;
+    --navy-mid: #E8EEFF;
+    --text-primary: #0A1428;
+    --text-secondary: #334470;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--navy);
+    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+  }
+  /* ambient glow */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(212,175,55,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 30% at 80% 80%, rgba(107,45,139,0.05) 0%, transparent 60%);
+  }
+  .cinzel { font-family: 'Cinzel', serif; }
+  .glass-card {
+    background: rgba(14,24,54,0.85);
+    border: 1px solid rgba(212,175,55,0.3);
+    backdrop-filter: blur(12px);
+    transition: border-color 0.3s;
+  }
+  html.light .glass-card {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(212,175,55,0.4);
+  }
+  .glass-card:hover { border-color: rgba(212,175,55,0.75); }
+  .gold { color: var(--gold); }
+  .gold-gradient {
+    background: linear-gradient(135deg, #D4AF37, #F0D060, #D4AF37);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(7,13,31,0.92);
+    border-bottom: 1px solid rgba(212,175,55,0.2);
+    backdrop-filter: blur(16px);
+  }
+  html.light nav {
+    background: rgba(240,244,255,0.95);
+    border-bottom: 1px solid rgba(212,175,55,0.3);
+  }
+  .nav-link {
+    position: relative; padding: 4px 0; font-size: 14px; font-weight: 500;
+    color: var(--text-secondary); transition: color 0.2s; cursor: pointer;
+    text-decoration: none;
+  }
+  .nav-link::after {
+    content: ''; position: absolute; bottom: -2px; left: 0; right: 0;
+    height: 2px; background: var(--gold); transform: scaleX(0);
+    transition: transform 0.25s ease; border-radius: 2px;
+  }
+  .nav-link:hover, .nav-link.active { color: var(--gold); }
+  .nav-link.active::after, .nav-link:hover::after { transform: scaleX(1); }
+  /* Hero */
+  .hero-bg {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #070D1F 0%, #0A1835 50%, #070D1F 100%);
+    position: relative; overflow: hidden;
+  }
+  html.light .hero-bg { background: linear-gradient(160deg, #E8EEFF 0%, #D0DCFF 50%, #E8EEFF 100%); }
+  .hero-bg::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(212,175,55,0.08) 0%, transparent 70%);
+  }
+  /* Equalizer bars */
+  .eq-bar {
+    display: inline-block; width: 3px; border-radius: 2px;
+    background: var(--gold); animation: eq-bounce 0.8s ease-in-out infinite alternate;
+    transform-origin: bottom;
+  }
+  .eq-bar:nth-child(1) { animation-delay: 0s; height: 8px; }
+  .eq-bar:nth-child(2) { animation-delay: 0.15s; height: 14px; }
+  .eq-bar:nth-child(3) { animation-delay: 0.3s; height: 10px; }
+  .eq-bar:nth-child(4) { animation-delay: 0.1s; height: 16px; }
+  .eq-bar:nth-child(5) { animation-delay: 0.25s; height: 7px; }
+  @keyframes eq-bounce { from { transform: scaleY(0.3); } to { transform: scaleY(1); } }
+  .eq-paused .eq-bar { animation-play-state: paused; transform: scaleY(0.3); }
+  /* Rainbow footer text */
+  @keyframes rainbow-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .rainbow-text {
+    background: linear-gradient(90deg,#D4AF37,#c0392b,#8e44ad,#2980b9,#27ae60,#D4AF37,#F0D060);
+    background-size: 300% 300%;
+    animation: rainbow-shift 4s ease infinite;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  /* Page sections */
+  .page { display: none; padding-top: 80px; min-height: 100vh; }
+  .page.active { display: block; }
+  /* Section headings */
+  .section-heading {
+    font-family: 'Cinzel', serif; font-size: 2rem; font-weight: 700;
+    color: var(--gold); letter-spacing: 2px; text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  .section-divider {
+    width: 80px; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0 auto 2.5rem;
+  }
+  /* Live Season pill */
+  .season-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px; border-radius: 999px;
+    background: rgba(14,24,54,0.85); border: 1px solid rgba(212,175,55,0.3);
+    backdrop-filter: blur(8px); font-size: 13px; font-weight: 600;
+  }
+  html.light .season-pill { background: rgba(255,255,255,0.9); }
+  .season-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.3); }
+  }
+  /* Gallery grid */
+  .gallery-img {
+    width: 100%; height: 220px; object-fit: cover;
+    transition: transform 0.4s ease; display: block;
+  }
+  .gallery-item:hover .gallery-img { transform: scale(1.05); }
+  /* Mobile menu */
+  #mobile-menu { display: none; }
+  #mobile-menu.open { display: block; }
+  /* Scroll */
+  html { scroll-behavior: smooth; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--navy); }
+  ::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.4); border-radius: 3px; }
+  /* Music player */
+  #music-player {
+    position: fixed; bottom: 24px; right: 24px; z-index: 200;
+    min-width: 280px; max-width: 320px;
+    background: rgba(7,13,31,0.92); border: 1px solid rgba(212,175,55,0.4);
+    border-radius: 16px; backdrop-filter: blur(20px);
+    padding: 14px 16px; transition: all 0.3s;
+  }
+  html.light #music-player {
+    background: rgba(255,255,255,0.95); border-color: rgba(212,175,55,0.5);
+  }
+  #music-player.minimized { min-width: unset; max-width: unset; width: 56px; height: 56px; padding: 0; overflow: hidden; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  #music-player.minimized #player-expanded { display: none; }
+  #music-player.minimized #player-mini-icon { display: flex; }
+  #player-mini-icon { display: none; }
+  /* Ministry cards */
+  .ministry-img { width: 100%; height: 180px; object-fit: cover; }
+  /* Status bar */
+  #status-bar {
+    display: flex; align-items: center; justify-content: center; gap: 20px;
+    flex-wrap: wrap; padding: 12px 20px;
+    background: rgba(7,13,31,0.6); border-top: 1px solid rgba(212,175,55,0.15);
+    border-bottom: 1px solid rgba(212,175,55,0.15); backdrop-filter: blur(8px);
+  }
+  html.light #status-bar { background: rgba(240,244,255,0.8); }
+  /* Confirmation card */
+  .verse-confirm {
+    background: linear-gradient(135deg, rgba(14,24,54,0.95), rgba(10,20,40,0.95));
+    border: 1px solid rgba(212,175,55,0.5); border-radius: 16px; padding: 32px;
+    text-align: center; max-width: 540px; margin: 0 auto;
+  }
+  html.light .verse-confirm { background: linear-gradient(135deg, #fff, #f0f4ff); }
+  /* spin animation for cross */
+  @keyframes cross-glow {
+    0%,100% { text-shadow: 0 0 10px rgba(212,175,55,0.5); }
+    50% { text-shadow: 0 0 25px rgba(212,175,55,0.9), 0 0 50px rgba(212,175,55,0.4); }
+  }
+  .cross-glow { animation: cross-glow 3s ease-in-out infinite; }
+  /* Button base */
+  .btn-gold {
+    background: linear-gradient(135deg, #D4AF37, #F0D060);
+    color: #070D1F; font-weight: 700; border: none; cursor: pointer;
+    border-radius: 999px; transition: opacity 0.2s, transform 0.1s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .btn-gold:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-gold:active { transform: translateY(0); }
+  /* Input base */
+  .inp {
+    width: 100%; padding: 10px 14px; border-radius: 8px; outline: none;
+    background: rgba(10,20,40,0.6); border: 1px solid rgba(212,175,55,0.25);
+    color: var(--text-primary); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  html.light .inp { background: rgba(255,255,255,0.8); border-color: rgba(212,175,55,0.4); }
+  .inp:focus { border-color: rgba(212,175,55,0.7); }
+  .inp::placeholder { color: var(--text-secondary); opacity: 0.7; }
+  /* Schedule card */
+  .sched-card {
+    display: grid; grid-template-columns: auto 1fr; gap: 0 16px;
+    background: rgba(14,24,54,0.85); border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 12px; padding: 16px 20px; transition: border-color 0.3s;
+  }
+  html.light .sched-card { background: rgba(255,255,255,0.9); }
+  .sched-card:hover { border-color: rgba(212,175,55,0.5); }
+  /* Overlay for joining */
+  .form-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block; }
+  textarea.inp { resize: vertical; min-height: 80px; }
+  /* Transition fade */
+  .page-fade { animation: pageFade 0.35s ease; }
+  @keyframes pageFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 </head>
-<body class="min-h-screen transition-colors duration-300">
+<body>
 
-<!-- ── DATA INJECTION (matches app.py _get_all_data keys exactly) ── -->
-<script>
-  const _S   = JSON.parse('{{ settings   | safe }}');
-  const _C   = JSON.parse('{{ cards      | safe }}');
-  const _M   = JSON.parse('{{ ministries | safe }}');
-  const _SC  = JSON.parse('{{ schedules  | safe }}');
-  const _G   = JSON.parse('{{ gallery    | safe }}');
-  const _O   = JSON.parse('{{ officers   | safe }}');
-  const _LIT = JSON.parse('{{ liturgical | safe }}');
-  const INITIAL_PAGE = '{{ initial_page }}';
-</script>
-
-<!-- NAV -->
-<nav class="nav-bar sticky top-0 z-40 border-b">
+<!-- ═══════════════════════════════════════════════════
+     NAV
+═══════════════════════════════════════════════════ -->
+<nav>
   <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+    <!-- Logo -->
     <button onclick="navigate('home')" class="flex items-center gap-3 shrink-0">
-      <div class="w-9 h-9 rounded-full border-2 border-gold flex items-center justify-center gold-glow">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2L14 7H19L15 10.5L16.5 16L12 13L7.5 16L9 10.5L5 7H10L12 2Z" fill="#D4AF37"/>
-          <rect x="11" y="16" width="2" height="6" rx="1" fill="#D4AF37"/>
-          <rect x="8" y="20" width="8" height="1.5" rx="0.75" fill="#D4AF37"/>
-        </svg>
-      </div>
-      <span id="nav-site-name" class="font-cinzel text-sm font-bold tracking-widest gold-text hidden sm:block">LITURGICAL CLUB</span>
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="17" stroke="#D4AF37" stroke-width="1.5" fill="rgba(10,20,40,0.6)"/>
+        <line x1="18" y1="6" x2="18" y2="30" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"/>
+        <line x1="10" y1="13" x2="26" y2="13" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="18" cy="18" r="3" fill="#D4AF37" opacity="0.6"/>
+      </svg>
+      <span class="cinzel font-bold text-base leading-tight" style="color:var(--gold);" id="nav-site-name">Liturgical Club</span>
     </button>
-
-    <div class="hidden md:flex items-center gap-6 text-sm font-medium">
-      <button onclick="navigate('home')"        class="nav-link" data-page="home">Home</button>
-      <button onclick="navigate('about')"       class="nav-link" data-page="about">About</button>
-      <button onclick="navigate('ministries')"  class="nav-link" data-page="ministries">Ministries</button>
-      <button onclick="navigate('schedules')"   class="nav-link" data-page="schedules">Schedules</button>
-      <button onclick="navigate('gallery')"     class="nav-link" data-page="gallery">Gallery</button>
-      <button onclick="navigate('join')"        class="nav-link" data-page="join">Join</button>
+    <!-- Desktop links -->
+    <div class="hidden md:flex items-center gap-6">
+      <span class="nav-link active" onclick="navigate('home')" id="nav-home">Home</span>
+      <span class="nav-link" onclick="navigate('about')" id="nav-about">About</span>
+      <span class="nav-link" onclick="navigate('ministries')" id="nav-ministries">Ministries</span>
+      <span class="nav-link" onclick="navigate('schedules')" id="nav-schedules">Schedules</span>
+      <span class="nav-link" onclick="navigate('gallery')" id="nav-gallery">Gallery</span>
+      <span class="nav-link" onclick="navigate('join')" id="nav-join">Join</span>
     </div>
-
-    <div class="flex items-center gap-3 shrink-0">
-      <a id="fb-link" href="#" target="_blank" class="opacity-60 hover:opacity-100 hover:text-gold transition-all" aria-label="Facebook">
+    <!-- Right cluster -->
+    <div class="hidden md:flex items-center gap-4">
+      <a id="nav-fb" href="#" target="_blank" rel="noopener" class="nav-link" title="Facebook">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
       </a>
-      <button onclick="toggleTheme()" class="opacity-60 hover:opacity-100 hover:text-gold transition-all" aria-label="Toggle theme">
-        <span id="sun-icon" class="hidden"><i data-lucide="sun" width="18" height="18"></i></span>
-        <span id="moon-icon"><i data-lucide="moon" width="18" height="18"></i></span>
+      <!-- Theme toggle -->
+      <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-full border border-gold/30 hover:border-gold/70 transition" title="Toggle theme" style="border-color:rgba(212,175,55,0.3)">
+        <span id="theme-icon"><i data-lucide="sun" width="16" height="16"></i></span>
       </button>
-      <a href="/admin" class="opacity-60 hover:opacity-100 hover:text-gold transition-all" aria-label="Admin">
-        <i data-lucide="settings" width="18" height="18"></i>
+      <!-- Admin lock -->
+      <a href="/admin" class="nav-link opacity-50 hover:opacity-100" title="Admin">
+        <i data-lucide="lock" width="14" height="14"></i>
       </a>
-      <button class="md:hidden opacity-60 hover:opacity-100" onclick="toggleMobileMenu()">
-        <i data-lucide="menu" width="20" height="20"></i>
-      </button>
     </div>
+    <!-- Mobile burger -->
+    <button onclick="document.getElementById('mobile-menu').classList.toggle('open')" class="md:hidden p-2" style="color:var(--gold)">
+      <i data-lucide="menu" width="22" height="22"></i>
+    </button>
   </div>
-  <div id="mobile-menu" class="hidden md:hidden border-t gold-border px-4 py-3 flex flex-col gap-2 text-sm font-medium">
-    <button onclick="navigate('home');toggleMobileMenu()"       class="text-left py-1">Home</button>
-    <button onclick="navigate('about');toggleMobileMenu()"      class="text-left py-1">About</button>
-    <button onclick="navigate('ministries');toggleMobileMenu()" class="text-left py-1">Ministries</button>
-    <button onclick="navigate('schedules');toggleMobileMenu()"  class="text-left py-1">Schedules</button>
-    <button onclick="navigate('gallery');toggleMobileMenu()"    class="text-left py-1">Gallery</button>
-    <button onclick="navigate('join');toggleMobileMenu()"       class="text-left py-1">Join</button>
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="md:hidden px-4 pb-4 border-t" style="border-color:rgba(212,175,55,0.15)">
+    <div class="flex flex-col gap-3 pt-3">
+      <span class="nav-link" onclick="navigate('home');closeMobileMenu()">Home</span>
+      <span class="nav-link" onclick="navigate('about');closeMobileMenu()">About</span>
+      <span class="nav-link" onclick="navigate('ministries');closeMobileMenu()">Ministries</span>
+      <span class="nav-link" onclick="navigate('schedules');closeMobileMenu()">Schedules</span>
+      <span class="nav-link" onclick="navigate('gallery');closeMobileMenu()">Gallery</span>
+      <span class="nav-link" onclick="navigate('join');closeMobileMenu()">Join</span>
+      <div class="flex items-center gap-4 pt-2">
+        <button onclick="toggleTheme()" class="text-sm" style="color:var(--gold)">Toggle Theme</button>
+        <a href="/admin" style="color:var(--gold);font-size:13px;">⚙ Admin</a>
+      </div>
+    </div>
   </div>
 </nav>
 
-<!-- MAIN -->
-<main>
-
-  <!-- HOME -->
-  <div id="view-home" class="view">
-    <section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      <div id="hero-bg" class="absolute inset-0 bg-cover bg-center" style="filter:brightness(0.3);"></div>
-      <div class="hero-gradient absolute inset-0"></div>
-      <div class="relative z-10 text-center px-4 max-w-4xl mx-auto">
-        <div class="inline-flex items-center gap-2 gold-border rounded-full px-4 py-1 text-xs font-medium gold-text mb-6 glass">
-          <span class="vestment-dot bg-gold" id="hero-season-dot" style="color:#D4AF37;background:#D4AF37;"></span>
-          <span id="hero-season-label">Ordinary Time</span>
-        </div>
-        <h1 id="hero-title" class="font-cinzel text-4xl md:text-6xl font-black tracking-widest leading-tight gold-text mb-4">FAITH, REVERENCE &amp; SERVICE</h1>
-        <p id="hero-subtitle" class="text-lg md:text-xl opacity-80 mb-8 max-w-xl mx-auto leading-relaxed italic">To serve at the altar is to serve the Lord.</p>
-        <div class="flex gap-4 justify-center flex-wrap">
-          <button onclick="navigate('join')" class="btn-gold">Join the Ministry</button>
-          <button onclick="navigate('about')" class="btn-outline">Learn More</button>
-        </div>
+<!-- ═══════════════════════════════════════════════════
+     HOME PAGE
+═══════════════════════════════════════════════════ -->
+<section id="page-home" class="page active">
+  <!-- Hero -->
+  <div class="hero-bg relative flex flex-col items-center justify-center text-center px-4" style="min-height:100vh;">
+    <div class="relative z-10 max-w-3xl">
+      <div class="text-7xl mb-6 cross-glow cinzel" style="color:var(--gold)">✝</div>
+      <h1 id="hero-title" class="cinzel text-4xl md:text-6xl font-black mb-4 leading-tight" style="color:var(--gold);">
+        Welcome to the Liturgical Club
+      </h1>
+      <p id="hero-subtitle" class="text-lg md:text-xl mb-8 max-w-xl mx-auto" style="color:var(--text-secondary);">
+        A community of young ministers dedicated to the beauty of Catholic worship
+      </p>
+      <div class="flex flex-wrap gap-4 justify-center">
+        <button onclick="navigate('join')" class="btn-gold px-8 py-3 text-sm">Join Our Ministry</button>
+        <button onclick="navigate('about')" class="px-8 py-3 text-sm font-semibold rounded-full border transition" style="border-color:rgba(212,175,55,0.5);color:var(--gold);background:transparent;" onmouseover="this.style.background='rgba(212,175,55,0.1)'" onmouseout="this.style.background='transparent'">Learn More</button>
       </div>
-      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-50">
-        <i data-lucide="chevron-down" width="24" height="24"></i>
-      </div>
-    </section>
-
-    <section class="max-w-7xl mx-auto px-4 py-16">
-      <h2 class="font-cinzel text-2xl font-bold text-center gold-text mb-10 tracking-wider">OUR COMMUNITY</h2>
-      <div id="info-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
-    </section>
-  </div>
-
-  <!-- ABOUT -->
-  <div id="view-about" class="view">
-    <div class="max-w-5xl mx-auto px-4 py-16">
-      <div class="text-center mb-12">
-        <h2 class="font-cinzel text-3xl font-bold gold-text tracking-wider mb-2">About Us</h2>
-        <div class="w-24 h-0.5 bg-gold mx-auto opacity-50"></div>
-      </div>
-      <div class="card-bg gold-border rounded-2xl p-8 mb-8 gold-glow">
-        <h3 class="font-cinzel text-xl gold-text mb-4 flex items-center gap-2">
-          <i data-lucide="book-open" width="20" height="20"></i> Who We Are
-        </h3>
-        <p id="about-text" class="opacity-80 leading-relaxed"></p>
-      </div>
-      <div class="card-bg gold-border rounded-2xl p-8 mb-12 text-center">
-        <div class="w-20 h-20 rounded-full border-2 border-gold mx-auto mb-4 flex items-center justify-center gold-glow text-3xl">✝</div>
-        <h3 class="font-cinzel text-xl gold-text mb-2">St. Tarcisius</h3>
-        <p class="text-xs opacity-50 mb-3 uppercase tracking-wider">Patron Saint of Altar Servers</p>
-        <p class="opacity-80 leading-relaxed text-sm max-w-xl mx-auto">Saint Tarcisius was a young Christian martyr who died in the 3rd century defending the Eucharist. He is venerated as the patron saint of altar servers and First Communicants — a model of courage and devotion in service to the Lord.</p>
-      </div>
-      <h3 class="font-cinzel text-xl gold-text mb-6 text-center tracking-wider">OUR OFFICERS</h3>
-      <div id="officers-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5"></div>
     </div>
   </div>
 
-  <!-- MINISTRIES -->
-  <div id="view-ministries" class="view">
-    <div class="max-w-7xl mx-auto px-4 py-16">
-      <div class="text-center mb-12">
-        <h2 class="font-cinzel text-3xl font-bold gold-text tracking-wider mb-2">Ministries</h2>
-        <div class="w-24 h-0.5 bg-gold mx-auto opacity-50"></div>
-        <p class="opacity-60 mt-3 text-sm">Discover where you are called to serve</p>
-      </div>
-      <div id="ministries-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-    </div>
+  <!-- Info Cards -->
+  <div class="max-w-7xl mx-auto px-4 py-16">
+    <h2 class="section-heading">Our Community</h2>
+    <div class="section-divider"></div>
+    <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
   </div>
+</section>
 
-  <!-- SCHEDULES -->
-  <div id="view-schedules" class="view">
-    <div class="max-w-5xl mx-auto px-4 py-16">
-      <div class="text-center mb-10">
-        <h2 class="font-cinzel text-3xl font-bold gold-text tracking-wider mb-2">Schedules</h2>
-        <div class="w-24 h-0.5 bg-gold mx-auto opacity-50"></div>
-      </div>
-      <div id="schedules-list" class="space-y-4"></div>
+<!-- ═══════════════════════════════════════════════════
+     ABOUT PAGE
+═══════════════════════════════════════════════════ -->
+<section id="page-about" class="page">
+  <div class="max-w-5xl mx-auto px-4 py-16">
+    <h2 class="section-heading">About Us</h2>
+    <div class="section-divider"></div>
+    <div class="glass-card rounded-2xl p-8 md:p-12 mb-12">
+      <div class="text-5xl text-center mb-6 cross-glow" style="color:var(--gold)">✝</div>
+      <p id="about-text" class="text-base leading-8 text-center" style="color:var(--text-secondary);"></p>
     </div>
+    <!-- Officers -->
+    <h3 class="section-heading text-2xl mb-2">Our Officers</h3>
+    <div class="section-divider"></div>
+    <div id="officers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
   </div>
+</section>
 
-  <!-- GALLERY -->
-  <div id="view-gallery" class="view">
-    <div class="max-w-7xl mx-auto px-4 py-16">
-      <div class="text-center mb-12">
-        <h2 class="font-cinzel text-3xl font-bold gold-text tracking-wider mb-2">Gallery</h2>
-        <div class="w-24 h-0.5 bg-gold mx-auto opacity-50"></div>
-      </div>
-      <div id="gallery-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
-    </div>
+<!-- ═══════════════════════════════════════════════════
+     MINISTRIES PAGE
+═══════════════════════════════════════════════════ -->
+<section id="page-ministries" class="page">
+  <div class="max-w-7xl mx-auto px-4 py-16">
+    <h2 class="section-heading">Our Ministries</h2>
+    <div class="section-divider"></div>
+    <div id="ministries-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
   </div>
+</section>
 
-  <!-- JOIN -->
-  <div id="view-join" class="view">
-    <div class="max-w-xl mx-auto px-4 py-16">
-      <div class="text-center mb-10">
-        <h2 class="font-cinzel text-3xl font-bold gold-text tracking-wider mb-2">Join Us</h2>
-        <div class="w-24 h-0.5 bg-gold mx-auto opacity-50"></div>
-        <p class="opacity-60 mt-3 text-sm">Answer the call to serve</p>
-      </div>
-      <div id="join-success" class="hidden card-bg border border-green-500/40 rounded-2xl p-6 text-center mb-6">
-        <i data-lucide="check-circle-2" width="40" height="40" class="text-green-400 mx-auto mb-2"></i>
-        <p class="font-cinzel gold-text">Application Received!</p>
-        <p class="text-sm opacity-60 mt-1">We&#39;ll be in touch soon. God bless you!</p>
-      </div>
-      <div class="card-bg gold-border rounded-2xl p-8 gold-glow">
-        <form id="join-form" onsubmit="submitJoinForm(event)" class="space-y-5">
-          <div>
-            <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Full Name *</label>
-            <input type="text" name="name" required placeholder="Your full name" />
+<!-- ═══════════════════════════════════════════════════
+     SCHEDULES PAGE
+═══════════════════════════════════════════════════ -->
+<section id="page-schedules" class="page">
+  <div class="max-w-4xl mx-auto px-4 py-16">
+    <h2 class="section-heading">Schedules</h2>
+    <div class="section-divider"></div>
+    <div id="schedules-list" class="flex flex-col gap-4"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     GALLERY PAGE
+═══════════════════════════════════════════════════ -->
+<section id="page-gallery" class="page">
+  <div class="max-w-7xl mx-auto px-4 py-16">
+    <h2 class="section-heading">Gallery</h2>
+    <div class="section-divider"></div>
+    <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     JOIN PAGE
+═══════════════════════════════════════════════════ -->
+<section id="page-join" class="page">
+  <div class="max-w-2xl mx-auto px-4 py-16">
+    <h2 class="section-heading">Join Our Ministry</h2>
+    <div class="section-divider"></div>
+    <div id="join-form-container">
+      <div class="glass-card rounded-2xl p-8">
+        <p class="text-sm mb-6 text-center" style="color:var(--text-secondary);">Fill in the form below. A random Catholic Bible Verse will be emailed to you upon submission as a gift from our community.</p>
+        <form id="join-form" onsubmit="submitJoinForm(event)">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">Full Name <span style="color:#e74c3c">*</span></label>
+              <input name="full_name" class="inp" placeholder="Your full name" required/>
+            </div>
+            <div>
+              <label class="form-label">Email Address <span style="color:#e74c3c">*</span></label>
+              <input name="email" type="email" class="inp" placeholder="your@email.com" required/>
+            </div>
+            <div>
+              <label class="form-label">Age</label>
+              <input name="age" type="number" min="5" max="99" class="inp" placeholder="Your age"/>
+            </div>
+            <div>
+              <label class="form-label">Phone / Messenger</label>
+              <input name="contact" class="inp" placeholder="+63 912 345 6789 or FB name"/>
+            </div>
+            <div class="md:col-span-2">
+              <label class="form-label">Preferred Ministry</label>
+              <select name="ministry" class="inp">
+                <option value="">— Select a Ministry —</option>
+                <option>Altar Servers</option>
+                <option>Lectors &amp; Commentators</option>
+                <option>Liturgical Choir</option>
+                <option>Extraordinary Ministers</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label class="form-label">Prior Experience</label>
+              <textarea name="experience" class="inp" placeholder="Any previous experience in liturgy, choir, etc."></textarea>
+            </div>
+            <div class="md:col-span-2">
+              <label class="form-label">Note / Message</label>
+              <textarea name="note" class="inp" placeholder="Anything you'd like to share with us…"></textarea>
+            </div>
           </div>
-          <div>
-            <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Age</label>
-            <input type="number" name="age" placeholder="Your age" />
+          <div class="mt-6 text-center">
+            <button type="submit" class="btn-gold px-10 py-3 text-sm" id="join-submit-btn">
+              <span id="join-btn-text">Submit Application ✝</span>
+            </button>
           </div>
-          <div>
-            <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Contact Number</label>
-            <input type="text" name="contact" placeholder="+63 9XX XXX XXXX" />
-          </div>
-          <div>
-            <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Ministry of Interest</label>
-            <select name="ministry" id="join-ministry-select">
-              <option value="">&#8212; Select Ministry &#8212;</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Prior Experience</label>
-            <textarea name="experience" rows="3" placeholder="Any liturgical or ministry experience..."></textarea>
-          </div>
-          <div>
-            <label class="text-xs uppercase tracking-wider opacity-60 mb-1 block">Why do you want to join?</label>
-            <textarea name="note" rows="4" placeholder="Share your heart..."></textarea>
-          </div>
-          <button type="submit" class="btn-gold w-full text-center flex items-center justify-center gap-2">
-            <i data-lucide="send" width="16" height="16"></i>
-            Submit Application
-          </button>
         </form>
       </div>
     </div>
-  </div>
-
-</main>
-
-<!-- STATUS BAR -->
-<div class="status-bar py-3 mt-8">
-  <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm">
-    <div class="flex items-center gap-2 opacity-80">
-      <i data-lucide="clock" width="15" height="15" class="gold-text"></i>
-      <span class="font-mono font-semibold" id="pht-clock">--:--:-- --</span>
-      <span class="text-xs opacity-50">PHT (GMT+8)</span>
-    </div>
-    <span class="hidden sm:block opacity-20">|</span>
-    <div class="flex items-center gap-2">
-      <span id="season-pill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border border-current/20" style="background:rgba(0,0,0,0.2);">
-        <span id="season-dot" class="vestment-dot" style="color:#2E7D32;background:#2E7D32;"></span>
-        <span id="season-label-text" class="font-cinzel tracking-wide">Ordinary Time</span>
-      </span>
+    <!-- Confirmation card (hidden until submit) -->
+    <div id="join-confirm" style="display:none;" class="page-fade">
+      <div class="verse-confirm">
+        <div class="text-6xl mb-4 cross-glow" style="color:var(--gold)">✝</div>
+        <h3 class="cinzel text-2xl font-bold mb-2" style="color:var(--gold);">Application Received!</h3>
+        <p class="text-sm mb-6" style="color:var(--text-secondary);">Thank you for joining. A welcome email has been sent to you with your sacred verse:</p>
+        <div class="rounded-xl p-5 mb-4 text-left" style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.3);">
+          <p class="text-xs font-bold mb-2 tracking-widest" style="color:var(--gold);">✦ YOUR VERSE FOR TODAY ✦</p>
+          <p id="confirm-verse-text" class="italic text-base leading-7 mb-2" style="color:var(--text-primary);"></p>
+          <p id="confirm-verse-ref" class="text-right text-sm font-bold" style="color:var(--gold);"></p>
+        </div>
+        <button onclick="navigate('home')" class="btn-gold px-8 py-3 text-sm mt-2">Return Home</button>
+      </div>
     </div>
   </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     STATUS BAR (above footer)
+═══════════════════════════════════════════════════ -->
+<div id="status-bar">
+  <div class="flex items-center gap-2">
+    <i data-lucide="clock" width="14" height="14" style="color:var(--gold)"></i>
+    <span class="text-xs font-mono font-bold" id="pht-clock" style="color:var(--gold);">--:--:-- PHT</span>
+  </div>
+  <div id="season-pill-container"></div>
 </div>
 
-<!-- FOOTER -->
-<footer class="py-8 text-center border-t gold-border">
-  <p id="footer-text" class="rainbow-text text-sm font-semibold tracking-wide font-cinzel"></p>
-  <p id="footer-sub" class="text-xs opacity-30 mt-2"></p>
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════ -->
+<footer class="py-8 text-center border-t" style="border-color:rgba(212,175,55,0.15);">
+  <p class="text-sm font-semibold rainbow-text" id="footer-text">© 2026 Liturgical Club | Developed by: Begie</p>
+  <p class="text-xs mt-2" style="color:var(--text-secondary);">Ora et Labora · Serving with Joy and Faith</p>
 </footer>
 
-<!-- LIGHTBOX -->
-<div id="lightbox" class="lightbox-overlay" onclick="closeLightbox()">
-  <button class="absolute top-4 right-4 text-white opacity-70 hover:opacity-100 z-10">
-    <i data-lucide="x" width="28" height="28"></i>
+<!-- ═══════════════════════════════════════════════════
+     MUSIC PLAYER
+═══════════════════════════════════════════════════ -->
+<div id="music-player" style="display:none;">
+  <!-- Mini icon (when minimized) -->
+  <button id="player-mini-icon" onclick="expandPlayer()" style="color:var(--gold);width:100%;height:100%;align-items:center;justify-content:center;">
+    <i data-lucide="music" width="22" height="22"></i>
   </button>
-  <img id="lightbox-img" src="" alt="" class="max-w-[90vw] max-h-[85vh] rounded-xl object-contain" onclick="event.stopPropagation()" />
-</div>
-
-<!-- MUSIC PLAYER -->
-<div class="mini-player" id="mini-player" style="display:none;">
-  <div class="mini-player-inner">
-    <div class="flex items-center gap-2 mb-2">
-      <div class="w-7 h-7 rounded-full bg-gold flex items-center justify-center shrink-0">
-        <i data-lucide="music" width="13" height="13" style="color:#091024"></i>
+  <!-- Expanded -->
+  <div id="player-expanded">
+    <div class="flex items-start justify-between mb-2">
+      <div class="flex items-end gap-1 mr-2" id="eq-container">
+        <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
       </div>
-      <span id="player-title" class="text-xs font-medium truncate max-w-[130px] opacity-80">Sacred Music</span>
-      <button onclick="togglePlay()" id="play-btn" class="ml-auto shrink-0">
-        <i data-lucide="play"  id="play-icon"  width="18" height="18" class="gold-text"></i>
-        <i data-lucide="pause" id="pause-icon" width="18" height="18" class="gold-text hidden"></i>
+      <div class="flex-1 min-w-0 mr-2">
+        <p class="text-xs font-semibold truncate" style="color:var(--gold);" id="player-title">Sacred Cathedral Instrumental</p>
+        <p class="text-xs" style="color:var(--text-secondary);">Liturgical Club</p>
+      </div>
+      <button onclick="minimizePlayer()" class="p-1 rounded" style="color:var(--text-secondary);" title="Minimize">
+        <i data-lucide="minus" width="14" height="14"></i>
       </button>
     </div>
-    <div class="flex items-center gap-2">
-      <i data-lucide="volume-2" width="12" height="12" class="opacity-50 shrink-0"></i>
-      <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.4"
-        oninput="document.getElementById('bg-audio').volume=this.value"
-        style="width:100%;height:3px;padding:0;background:rgba(212,175,55,0.2);border:none;accent-color:#D4AF37;cursor:pointer;" />
+    <div class="flex items-center gap-3">
+      <button onclick="togglePlay()" id="play-btn" class="btn-gold w-9 h-9 flex items-center justify-center rounded-full text-sm" style="min-width:36px;">
+        <i data-lucide="play" width="14" height="14" id="play-icon"></i>
+      </button>
+      <button onclick="toggleMute()" id="mute-btn" class="p-1 rounded" style="color:var(--text-secondary);">
+        <i data-lucide="volume-2" width="14" height="14" id="mute-icon"></i>
+      </button>
+      <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.6" oninput="setVolume(this.value)" class="flex-1 h-1 rounded-full cursor-pointer accent-yellow-500"/>
     </div>
   </div>
 </div>
-<audio id="bg-audio" loop></audio>
+
+<audio id="bg-audio" loop preload="none"></audio>
 
 <script>
-// ── THEME ──────────────────────────────────────────────────────────────────
-function applyTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  document.getElementById('sun-icon').classList.toggle('hidden', t !== 'dark');
-  document.getElementById('moon-icon').classList.toggle('hidden', t === 'dark');
-  try { localStorage.setItem('theme', t); } catch(e) {}
+// ─── Data injected by Flask ─────────────────────────────────────────
+const SETTINGS   = {{ settings|safe }};
+const CARDS      = {{ cards|safe }};
+const MINISTRIES = {{ ministries|safe }};
+const SCHEDULES  = {{ schedules|safe }};
+const GALLERY    = {{ gallery|safe }};
+const OFFICERS   = {{ officers|safe }};
+const LITURGICAL = {{ liturgical|safe }};
+const INITIAL_PAGE = "{{ initial_page }}";
+
+// ─── Theme ───────────────────────────────────────────────────────────
+function applyTheme(theme) {
+  document.documentElement.classList.toggle('light', theme === 'light');
+  document.documentElement.classList.toggle('dark', theme !== 'light');
+  document.getElementById('theme-icon').innerHTML = theme === 'light'
+    ? '<i data-lucide="moon" width="16" height="16"></i>'
+    : '<i data-lucide="sun" width="16" height="16"></i>';
+  lucide.createIcons();
 }
 function toggleTheme() {
-  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  const cur = localStorage.getItem('theme') || 'dark';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', next);
+  applyTheme(next);
 }
-(function() {
-  let saved = 'dark';
-  try { saved = localStorage.getItem('theme') || 'dark'; } catch(e) {}
-  applyTheme(saved);
-})();
+applyTheme(localStorage.getItem('theme') || 'dark');
 
-// ── NAVIGATION ─────────────────────────────────────────────────────────────
-const PAGE_PATHS = { home:'/', about:'/about', ministries:'/ministries', schedules:'/schedules', gallery:'/gallery', join:'/join' };
-const PATH_PAGES = Object.fromEntries(Object.entries(PAGE_PATHS).map(([k,v])=>[v,k]));
-
-function navigate(page, pushState=true) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-  const view = document.getElementById('view-' + page);
-  if (view) view.classList.add('active');
-  document.querySelectorAll(`[data-page="${page}"]`).forEach(l => l.classList.add('active'));
-  if (pushState) {
-    try { history.pushState({ page }, '', PAGE_PATHS[page] || '/'); } catch(e) {}
-  }
-  window.scrollTo({ top:0, behavior:'smooth' });
+// ─── SPA Navigation ──────────────────────────────────────────────────
+const PAGES = ['home','about','ministries','schedules','gallery','join'];
+function navigate(page) {
+  if (!PAGES.includes(page)) page = 'home';
+  PAGES.forEach(p => {
+    const el = document.getElementById('page-' + p);
+    const link = document.getElementById('nav-' + p);
+    if (el) { el.classList.toggle('active', p === page); if (p === page) el.classList.add('page-fade'); }
+    if (link) link.classList.toggle('active', p === page);
+  });
+  history.pushState({page}, '', page === 'home' ? '/' : '/' + page);
+  window.scrollTo({top: 0, behavior: 'smooth'});
   lucide.createIcons();
 }
-
-window.addEventListener('popstate', e => {
-  navigate(e.state && e.state.page ? e.state.page : (PATH_PAGES[location.pathname] || 'home'), false);
-});
-
-function toggleMobileMenu() {
-  document.getElementById('mobile-menu').classList.toggle('hidden');
+window.addEventListener('popstate', e => navigate((e.state && e.state.page) || 'home'));
+function closeMobileMenu() {
+  document.getElementById('mobile-menu').classList.remove('open');
 }
 
-// ── CLOCK ──────────────────────────────────────────────────────────────────
-function updateClock() {
-  const pht = new Date(new Date().toLocaleString('en-US', { timeZone:'Asia/Manila' }));
-  let h = pht.getHours(), m = pht.getMinutes(), s = pht.getSeconds();
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  h = h % 12 || 12;
-  document.getElementById('pht-clock').textContent =
-    `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} ${ampm}`;
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-// ── LITURGICAL SEASON DISPLAY ──────────────────────────────────────────────
-// _LIT keys from app.py: season, week_label, color, color_hex, is_override
-function renderSeason() {
-  const label = _LIT.week_label || _LIT.season || 'Ordinary Time';
-  const hex   = _LIT.color_hex  || '#2E7D32';
-
-  document.getElementById('season-label-text').textContent  = label;
-  document.getElementById('hero-season-label').textContent   = label;
-
-  ['season-dot','hero-season-dot'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) { el.style.background = hex; el.style.color = hex; }
-  });
-
-  const pill = document.getElementById('season-pill');
-  if (pill) pill.style.color = hex;
+// ─── Render helpers ──────────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function img(url, alt, cls) {
+  const src = url || 'https://images.unsplash.com/photo-1574607383476-f517f7d40f09?w=800&q=60';
+  return `<img src="${esc(src)}" alt="${esc(alt)}" class="${cls}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1574607383476-f517f7d40f09?w=400&q=60'"/>`;
 }
 
-// ── RENDER: HERO ───────────────────────────────────────────────────────────
-function renderHero() {
-  // site_name in nav
-  const siteName = _S.site_name || 'Liturgical Club';
-  document.getElementById('nav-site-name').textContent = siteName.toUpperCase();
-  document.getElementById('page-title').textContent    = siteName;
-  document.getElementById('footer-sub').textContent    = siteName + ' \u2014 In Nomine Patris';
-
-  if (_S.hero_title)    document.getElementById('hero-title').textContent    = _S.hero_title;
-  if (_S.hero_subtitle) document.getElementById('hero-subtitle').textContent = _S.hero_subtitle;
-
-  if (_S.hero_image_url) {
-    const bg = document.getElementById('hero-bg');
-    bg.style.backgroundImage = `url('${_S.hero_image_url}')`;
-  }
-  if (_S.facebook_url) document.getElementById('fb-link').href = _S.facebook_url;
-
-  document.getElementById('footer-text').textContent =
-    _S.footer_rainbow_text || siteName + ' \u00b7 Serving with Joy';
-}
-
-// ── RENDER: INFO CARDS ─────────────────────────────────────────────────────
-// _C keys: id, title, body, icon, order_index
-function renderInfoCards() {
-  const grid = document.getElementById('info-cards-grid');
-  if (!_C.length) {
-    grid.innerHTML = '<p class="col-span-3 text-center opacity-40 py-10">No info cards configured.</p>';
-    return;
-  }
-  grid.innerHTML = _C.map(c => `
-    <div class="card-bg gold-border rounded-2xl p-6 gold-glow hover:scale-[1.02] transition-transform">
-      <div class="text-3xl mb-3">${esc(c.icon) || '✦'}</div>
-      <h3 class="font-cinzel text-base font-bold gold-text mb-2">${esc(c.title)}</h3>
-      <p class="text-sm opacity-70 leading-relaxed">${esc(c.body)}</p>
+function renderCards() {
+  const g = document.getElementById('cards-grid');
+  if (!g) return;
+  g.innerHTML = CARDS.map(c => `
+    <div class="glass-card rounded-2xl p-6">
+      <div class="text-3xl mb-3">${esc(c.icon||'✝')}</div>
+      <h3 class="cinzel font-bold text-base mb-2" style="color:var(--gold);">${esc(c.title)}</h3>
+      <p class="text-sm leading-6" style="color:var(--text-secondary);">${esc(c.body)}</p>
     </div>`).join('');
 }
 
-// ── RENDER: ABOUT ──────────────────────────────────────────────────────────
-// _S key: about_text
-function renderAbout() {
-  document.getElementById('about-text').textContent =
-    _S.about_text || 'The Liturgical Club is dedicated to serving at the altar with reverence and devotion.';
-}
-
-// ── RENDER: OFFICERS ───────────────────────────────────────────────────────
-// _O keys: id, name, position, image_url, bio, order_index
 function renderOfficers() {
-  const grid = document.getElementById('officers-grid');
-  if (!_O.length) {
-    grid.innerHTML = '<p class="col-span-4 text-center opacity-40 py-6">No officers listed.</p>';
-    return;
-  }
-  grid.innerHTML = _O.map(o => `
-    <div class="card-bg gold-border rounded-xl p-4 text-center hover:scale-105 transition-transform">
-      <div class="w-16 h-16 rounded-full border-2 border-gold mx-auto mb-3 overflow-hidden flex items-center justify-center bg-navy-card">
-        ${o.image_url
-          ? `<img src="${esc(o.image_url)}" alt="${esc(o.name)}" class="w-full h-full object-cover" onerror="this.style.display='none'" />`
-          : `<i data-lucide="user" width="28" height="28" class="opacity-40"></i>`}
+  const g = document.getElementById('officers-grid');
+  if (!g) return;
+  g.innerHTML = OFFICERS.map(o => `
+    <div class="glass-card rounded-2xl overflow-hidden">
+      ${img(o.image_url, o.name, 'w-full h-48 object-cover object-top')}
+      <div class="p-5">
+        <h4 class="cinzel font-bold text-base mb-1" style="color:var(--gold);">${esc(o.name)}</h4>
+        <p class="text-xs font-semibold mb-2 tracking-wide" style="color:var(--text-secondary);">${esc(o.position)}</p>
+        <p class="text-sm leading-6" style="color:var(--text-secondary);">${esc(o.bio)}</p>
       </div>
-      <p class="font-cinzel text-xs font-bold gold-text">${esc(o.name)}</p>
-      <p class="text-xs opacity-50 mt-0.5">${esc(o.position)}</p>
-      ${o.bio ? `<p class="text-xs opacity-40 mt-1 leading-relaxed">${esc(o.bio)}</p>` : ''}
-    </div>`).join('');
+    </div>`).join('') || '<p class="text-center col-span-3" style="color:var(--text-secondary);">No officers listed yet.</p>';
 }
 
-// ── RENDER: MINISTRIES ─────────────────────────────────────────────────────
-// _M keys: id, name, description, image_url, order_index
 function renderMinistries() {
-  const grid = document.getElementById('ministries-grid');
-  const sel  = document.getElementById('join-ministry-select');
-
-  if (!_M.length) {
-    grid.innerHTML = '<p class="col-span-3 text-center opacity-40 py-10">No ministries configured.</p>';
-    return;
-  }
-  grid.innerHTML = _M.map(m => `
-    <div class="ministry-card card-bg gold-border rounded-2xl overflow-hidden gold-glow flex flex-col">
-      ${m.image_url
-        ? `<div class="h-40 bg-cover bg-center" style="background-image:url('${esc(m.image_url)}');filter:brightness(0.7);"></div>`
-        : `<div class="h-40 flex items-center justify-center opacity-20"><i data-lucide="church" width="48" height="48"></i></div>`}
-      <div class="p-6 flex flex-col flex-1">
-        <h3 class="font-cinzel text-base font-bold gold-text mb-2">${esc(m.name)}</h3>
-        <p class="text-sm opacity-70 mb-4 leading-relaxed flex-1">${esc(m.description)}</p>
-        <button onclick="applyMinistry('${esc(m.name)}')" class="btn-gold text-xs py-2 mt-auto">Apply Now</button>
+  const g = document.getElementById('ministries-grid');
+  if (!g) return;
+  g.innerHTML = MINISTRIES.map(m => `
+    <div class="glass-card rounded-2xl overflow-hidden ministry-card">
+      <div class="overflow-hidden">${img(m.image_url, m.name, 'ministry-img transition-transform duration-300')}</div>
+      <div class="p-6">
+        <h3 class="cinzel font-bold text-lg mb-2" style="color:var(--gold);">${esc(m.name)}</h3>
+        <p class="text-sm leading-6" style="color:var(--text-secondary);">${esc(m.description)}</p>
       </div>
-    </div>`).join('');
-
-  sel.innerHTML = '<option value="">&#8212; Select Ministry &#8212;</option>' +
-    _M.map(m => `<option value="${esc(m.name)}">${esc(m.name)}</option>`).join('');
+    </div>`).join('') || '<p style="color:var(--text-secondary);">No ministries yet.</p>';
 }
 
-function applyMinistry(name) {
-  navigate('join');
-  setTimeout(() => { document.getElementById('join-ministry-select').value = name; }, 120);
-}
-
-// ── RENDER: SCHEDULES ──────────────────────────────────────────────────────
-// _SC keys: id, title, day_time, location, description, order_index
 function renderSchedules() {
-  const list = document.getElementById('schedules-list');
-  if (!_SC.length) {
-    list.innerHTML = '<p class="text-center opacity-40 py-10">No schedules found.</p>';
-    return;
-  }
-  list.innerHTML = _SC.map(s => `
-    <div class="schedule-card card-bg gold-border rounded-xl px-6 py-4 flex items-start gap-4">
-      <div class="shrink-0 w-10 h-10 rounded-full border border-gold/30 flex items-center justify-center gold-text">
-        <i data-lucide="calendar" width="18" height="18"></i>
+  const g = document.getElementById('schedules-list');
+  if (!g) return;
+  g.innerHTML = SCHEDULES.map(s => `
+    <div class="sched-card">
+      <div class="pt-1" style="color:var(--gold)"><i data-lucide="calendar" width="20" height="20"></i></div>
+      <div>
+        <h4 class="font-bold text-sm mb-1" style="color:var(--gold);">${esc(s.title)}</h4>
+        <p class="text-xs font-semibold mb-1" style="color:var(--text-secondary);">${esc(s.day_time)}${s.location ? ' · ' + esc(s.location) : ''}</p>
+        <p class="text-sm leading-6" style="color:var(--text-secondary);">${esc(s.description)}</p>
       </div>
-      <div class="flex-1">
-        <h4 class="font-cinzel text-sm font-bold mb-1">${esc(s.title)}</h4>
-        <p class="text-xs opacity-60">${esc(s.day_time)}${s.location ? ' &middot; ' + esc(s.location) : ''}</p>
-        ${s.description ? `<p class="text-xs opacity-50 mt-1">${esc(s.description)}</p>` : ''}
-      </div>
-    </div>`).join('');
+    </div>`).join('') || '<p style="color:var(--text-secondary);">No schedules yet.</p>';
 }
 
-// ── RENDER: GALLERY ────────────────────────────────────────────────────────
-// _G keys: id, title, image_url, caption, order_index
 function renderGallery() {
-  const grid = document.getElementById('gallery-grid');
-  if (!_G.length) {
-    grid.innerHTML = '<p class="col-span-4 text-center opacity-40 py-10">No gallery images.</p>';
-    return;
-  }
-  grid.innerHTML = _G.map(g => `
-    <div class="relative group cursor-pointer overflow-hidden rounded-xl aspect-square gold-border"
-         onclick="openLightbox('${esc(g.image_url)}','${esc(g.caption || g.title)}')">
-      <img src="${esc(g.image_url)}" alt="${esc(g.caption || g.title)}"
-           class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-           loading="lazy" onerror="this.parentElement.classList.add('opacity-30')" />
-      <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
-        <p class="text-xs text-white truncate">${esc(g.caption || g.title)}</p>
+  const g = document.getElementById('gallery-grid');
+  if (!g) return;
+  g.innerHTML = GALLERY.map(item => `
+    <div class="glass-card gallery-item rounded-2xl overflow-hidden">
+      <div class="overflow-hidden">${img(item.image_url, item.title, 'gallery-img')}</div>
+      <div class="p-4">
+        <h4 class="font-semibold text-sm mb-1" style="color:var(--gold);">${esc(item.title)}</h4>
+        <p class="text-xs leading-5" style="color:var(--text-secondary);">${esc(item.caption)}</p>
       </div>
-    </div>`).join('');
+    </div>`).join('') || '<p style="color:var(--text-secondary);">No gallery items yet.</p>';
 }
 
-function openLightbox(url) {
-  document.getElementById('lightbox-img').src = url;
-  document.getElementById('lightbox').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-  document.body.style.overflow = '';
-}
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
-
-// ── MUSIC ──────────────────────────────────────────────────────────────────
-function initMusic() {
-  const src = _S.background_music_url;
-  if (!src) return;
-  const audio  = document.getElementById('bg-audio');
-  const player = document.getElementById('mini-player');
-  audio.src    = src;
-  audio.volume = 0.4;
-  player.style.display = 'block';
-  function tryPlay() { audio.play().then(() => updatePlayUI(true)).catch(() => {}); }
-  document.addEventListener('click',  tryPlay, { once:true });
-  document.addEventListener('scroll', tryPlay, { once:true });
-}
-function togglePlay() {
-  const a = document.getElementById('bg-audio');
-  if (a.paused) { a.play(); updatePlayUI(true); } else { a.pause(); updatePlayUI(false); }
-}
-function updatePlayUI(playing) {
-  document.getElementById('play-icon').classList.toggle('hidden', playing);
-  document.getElementById('pause-icon').classList.toggle('hidden', !playing);
+function renderSettings() {
+  document.getElementById('page-title').textContent = SETTINGS.site_name || 'Liturgical Club';
+  document.getElementById('nav-site-name').textContent = SETTINGS.site_name || 'Liturgical Club';
+  document.getElementById('hero-title').textContent = SETTINGS.hero_title || 'Welcome to the Liturgical Club';
+  document.getElementById('hero-subtitle').textContent = SETTINGS.hero_subtitle || '';
+  document.getElementById('about-text').textContent = SETTINGS.about_text || '';
+  const ft = document.getElementById('footer-text');
+  if (ft && SETTINGS.footer_rainbow_text) ft.textContent = SETTINGS.footer_rainbow_text;
+  const fb = document.getElementById('nav-fb');
+  if (fb) fb.href = SETTINGS.facebook_url || '#';
+  // Ministry dropdown — if ministries loaded populate select
+  const sel = document.querySelector('select[name="ministry"]');
+  if (sel && MINISTRIES.length > 0) {
+    sel.innerHTML = '<option value="">— Select a Ministry —</option>' + MINISTRIES.map(m=>`<option>${esc(m.name)}</option>`).join('');
+  }
 }
 
-// ── JOIN FORM ──────────────────────────────────────────────────────────────
+// ─── PHT Clock ───────────────────────────────────────────────────────
+function tickClock() {
+  const now = new Date();
+  const pht = new Date(now.toLocaleString('en-US', {timeZone:'Asia/Manila'}));
+  const hh = String(pht.getHours()).padStart(2,'0');
+  const mm = String(pht.getMinutes()).padStart(2,'0');
+  const ss = String(pht.getSeconds()).padStart(2,'0');
+  const ampm = pht.getHours() < 12 ? 'AM' : 'PM';
+  document.getElementById('pht-clock').textContent = `${hh}:${mm}:${ss} ${ampm} PHT (GMT+8)`;
+}
+setInterval(tickClock, 1000); tickClock();
+
+// ─── Liturgical Season Pill ───────────────────────────────────────────
+function renderSeasonPill() {
+  const colorMap = {
+    green: '#2E7D32', purple: '#6B2D8B', gold: '#D4AF37',
+    red: '#C0392B', white: '#E0E0E0', rose: '#FF6B9D'
+  };
+  const hex = colorMap[LITURGICAL.color] || '#2E7D32';
+  document.getElementById('season-pill-container').innerHTML = `
+    <div class="season-pill">
+      <span class="season-dot" style="background:${hex};box-shadow:0 0 8px ${hex};"></span>
+      <span class="text-xs font-semibold" style="color:var(--text-primary);">${esc(LITURGICAL.week_label)}</span>
+    </div>`;
+}
+
+// ─── Join form ────────────────────────────────────────────────────────
 async function submitJoinForm(e) {
   e.preventDefault();
-  const form = e.target;
-  const btn  = form.querySelector('button[type=submit]');
-  const data = Object.fromEntries(new FormData(form));
-  btn.disabled    = true;
-  btn.textContent = 'Sending\u2026';
+  const btn = document.getElementById('join-submit-btn');
+  const btnText = document.getElementById('join-btn-text');
+  btnText.textContent = 'Sending…';
+  btn.disabled = true;
+  const fd = new FormData(e.target);
+  const payload = {};
+  fd.forEach((v,k) => payload[k] = v);
   try {
-    const res = await fetch('/api/join', {
+    const r = await fetch('/api/join', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify(data),
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
     });
-    if (res.ok) {
-      form.reset();
-      const ok = document.getElementById('join-success');
-      ok.classList.remove('hidden');
-      lucide.createIcons();
-      setTimeout(() => ok.classList.add('hidden'), 6000);
-    } else { alert('Submission failed. Please try again.'); }
-  } catch { alert('Network error. Please try again.'); }
-  finally {
-    btn.disabled    = false;
-    btn.innerHTML   = '<i data-lucide="send" width="16" height="16"></i> Submit Application';
-    lucide.createIcons();
+    const data = await r.json();
+    if (data.success) {
+      // Parse verse
+      const verse = data.verse || '';
+      const match = verse.match(/^"(.+)"\s*[—-]\s*(.+)$/);
+      document.getElementById('confirm-verse-text').textContent = match ? match[1] : verse;
+      document.getElementById('confirm-verse-ref').textContent = match ? '— ' + match[2] : '';
+      document.getElementById('join-form-container').style.display = 'none';
+      document.getElementById('join-confirm').style.display = 'block';
+    } else {
+      alert(data.error || 'Something went wrong. Please try again.');
+      btnText.textContent = 'Submit Application ✝';
+      btn.disabled = false;
+    }
+  } catch (err) {
+    alert('Network error. Please check your connection and try again.');
+    btnText.textContent = 'Submit Application ✝';
+    btn.disabled = false;
   }
 }
 
-// ── HELPER: HTML escape ────────────────────────────────────────────────────
-function esc(s) {
-  if (s == null) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
+// ─── Music Player ─────────────────────────────────────────────────────
+let audioUnlocked = false;
+const audio = document.getElementById('bg-audio');
+let isPlaying = false;
 
-// ── INIT ───────────────────────────────────────────────────────────────────
-function init() {
-  renderHero();
-  renderSeason();
-  renderInfoCards();
-  renderAbout();
-  renderOfficers();
-  renderMinistries();
-  renderSchedules();
-  renderGallery();
-  initMusic();
-
-  const initPage = INITIAL_PAGE || PATH_PAGES[location.pathname] || 'home';
-  navigate(initPage, false);
+function setupPlayer() {
+  if (!SETTINGS.music_enabled) return;
+  const url = SETTINGS.music_url || '';
+  const title = SETTINGS.music_title || 'Sacred Cathedral Instrumental';
+  if (!url) return;
+  audio.src = url;
+  document.getElementById('player-title').textContent = title;
+  document.getElementById('music-player').style.display = '';
+  audio.volume = 0.6;
   lucide.createIcons();
 }
-init();
+
+function tryAutoPlay() {
+  if (audioUnlocked || !SETTINGS.music_enabled) return;
+  audio.play().then(() => {
+    audioUnlocked = true;
+    isPlaying = true;
+    updatePlayBtn();
+    updateEQ();
+  }).catch(() => {});
+}
+
+function unlockOnInteraction() {
+  tryAutoPlay();
+  document.removeEventListener('click', unlockOnInteraction);
+  document.removeEventListener('touchstart', unlockOnInteraction);
+  document.removeEventListener('scroll', unlockOnInteraction);
+  document.removeEventListener('keydown', unlockOnInteraction);
+}
+
+function togglePlay() {
+  if (audio.paused) { audio.play(); isPlaying = true; }
+  else { audio.pause(); isPlaying = false; }
+  updatePlayBtn(); updateEQ();
+}
+function toggleMute() {
+  audio.muted = !audio.muted;
+  document.getElementById('mute-icon').setAttribute('data-lucide', audio.muted ? 'volume-x' : 'volume-2');
+  lucide.createIcons();
+}
+function setVolume(v) { audio.volume = parseFloat(v); }
+function updatePlayBtn() {
+  document.getElementById('play-icon').setAttribute('data-lucide', audio.paused ? 'play' : 'pause');
+  lucide.createIcons();
+}
+function updateEQ() {
+  document.getElementById('eq-container').classList.toggle('eq-paused', audio.paused);
+}
+function minimizePlayer() {
+  document.getElementById('music-player').classList.add('minimized');
+}
+function expandPlayer() {
+  document.getElementById('music-player').classList.remove('minimized');
+}
+audio.addEventListener('play', () => { isPlaying = true; updatePlayBtn(); updateEQ(); });
+audio.addEventListener('pause', () => { isPlaying = false; updatePlayBtn(); updateEQ(); });
+
+// ─── Init ─────────────────────────────────────────────────────────────
+renderSettings();
+renderCards();
+renderOfficers();
+renderMinistries();
+renderSchedules();
+renderGallery();
+renderSeasonPill();
+setupPlayer();
+navigate(INITIAL_PAGE || 'home');
+
+document.addEventListener('click', unlockOnInteraction);
+document.addEventListener('touchstart', unlockOnInteraction, {passive:true});
+document.addEventListener('scroll', unlockOnInteraction, {passive:true});
+document.addEventListener('keydown', unlockOnInteraction);
+
+// Lucide final pass
+setTimeout(() => lucide.createIcons(), 100);
 </script>
 </body>
 </html>
